@@ -20,20 +20,21 @@ export default function AIPage(){
     }
     console.log(arrInputs)
     return (
-        <View className="flex-1 items-center">
-            <ScrollView contentContainerStyle={{flexGrow: 1}} style={{marginBottom: 70}}>
-            {arrInputs.map((inputList, key) =>
-            <>
-                <Text key={key} className="text-lg items-start m-10 mr-24 mt-4">{inputList}</Text>
-                <View className="flex-row mt-4 bg-white w-full min-h-min max-h-fit justify-center"> 
-                    <FontAwesomeIcon icon={faFaceSmile} style={{marginTop: 40, marginLeft: 30}} size={29}/>
-                    <Text className="m-10 mr-12 text-lg">{aiOut}</Text>
-                </View>
-            </>
-            )}
+        <View className="flex-1">
+            <ScrollView contentContainerStyle={{flexGrow: 1, alignItems: 'center'}} 
+            style={{marginBottom: 70}}>
+                {arrInputs.map((inputList, key) =>
+                <>
+                    <Text key={key} className="text-lg items-start m-10 mr-24 mt-4">{inputList}</Text>
+                    <View className="flex-row mt-4 bg-white w-full min-h-min max-h-fit justify-center"> 
+                        <FontAwesomeIcon icon={faFaceSmile} style={{marginTop: 40, marginLeft: 30}} size={29}/>
+                        <Text className="m-10 mr-12 text-lg">{aiOut}</Text>
+                    </View>
+                </>
+                )}
             </ScrollView>
-            <View className="flex-1 justify-center items-center">
-                {(arrInputs === undefined || arrInputs.length === 0) && <Text>Hello there, {name}</Text>}
+            <View className="justify-center items-center">
+                {(arrInputs === undefined || arrInputs.length === 0) ? <Text className="text-base absolute bottom-96">Hello there, {name}</Text> : console.log("Error")}
                 <TextInput placeholder='Start creating!' onChangeText={text => setText(text)} 
                 className="w-11/12 bottom-7 absolute" mode='outlined' outlineColor='black' value={textInput}
                 activeOutlineColor='gray' onFocus={() => setActive(!active)} 
