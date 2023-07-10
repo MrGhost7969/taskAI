@@ -32,8 +32,8 @@ export default function SearchPage(){
                         <Text className="text-base text-gray-600">Favorites</Text>
                     </View>
                     
-                        {pagesArr.map(i => 
-                        <Card mode='elevated'>
+                        {pagesArr.map((i, k) => 
+                        <Card mode='elevated' key={k} style={{backgroundColor: 'white', borderRadius: 15}}>
                             <Card.Title 
                                 title={i.title}
                                 subtitle={`in ${category}`}
@@ -44,8 +44,8 @@ export default function SearchPage(){
                 <View className="gap-3">
                     <Text className="text-base text-gray-600">Today</Text>
                     
-                        {pagesArr.map(i => 
-                        <Card mode='elevated'>
+                        {pagesArr.map((i, k) => 
+                        <Card mode='elevated' key={k} style={{backgroundColor: 'white', borderRadius: 15}}>
                             <Card.Title 
                                 title={i.title}
                                 subtitle={`in ${category}`}
@@ -56,8 +56,8 @@ export default function SearchPage(){
                 <View className="gap-3">
                     <Text className="text-base text-gray-600">Older</Text>
                     
-                    {pagesArr.map(i => 
-                    <Card mode='elevated'>
+                    {pagesArr.map((i, k) => 
+                    <Card mode='elevated' key={k} style={{backgroundColor: 'white', borderRadius: 15}}>
                         <Card.Title 
                             title={i.title}
                             subtitle={`in ${category}`}
