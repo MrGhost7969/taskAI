@@ -9,11 +9,9 @@ import Settings from './UserOptions/Settings';
 import { Divider } from 'react-native-paper';
 import Profile from './UserOptions/Profile';
 import Animated, { useSharedValue, ZoomIn, ZoomOut, useAnimatedStyle, withSequence, withTiming, withDelay, withSpring, SlideOutDown, FadeOut, FadeInUp, Easing, FadeOutUp, SlideInDown, RotateInDownLeft, RotateOutDownRight, Keyframe } from 'react-native-reanimated'
-import Page from './Page';
 const Stack = createNativeStackNavigator()
 
 export default function HomeStack() {
-
     return (
         <Stack.Navigator>
             <Stack.Screen name='Home' component={HomeScreen} />
@@ -23,17 +21,29 @@ export default function HomeStack() {
     )
 }
 
-function HomeScreen({ navigation }) {
+export let cardArr = [
+    { uri: 'https://picsum.photos/700', title: "titled untitled" },
+    { uri: 'https://picsum.photos/700', title: "Hello World" }
+]
+export let privPageArr = [
+    { uri: 'https://picsum.photos/700', title: "page of something" },
+    { uri: 'https://picsum.photos/700', title: "Software Development" }
+]
+
+export let arrTDs = [{ label: "Lorem ipsum tomi" }, { label: "ya boi stank oml" }, { label: "spaghetti ohs zos" }];
+
+function HomeScreen({ navigation, pageTitle, pageContent }) {
     let name = 'Random person'
     let email = "rando@gmail.com"
 
-    const [pageTitle, setPageTitle] = useState("");
-    const [pageContent, setPageContent] = useState("");
+    // ---------For later-----------
+    // const [pageTitle, setPageTitle] = useState("");  
+    // const [pageContent, setPageContent] = useState("");  
+
     const [show, setShow] = useState(false)
     const [isList, setList] = useState(false);
     const [profileToggle, setProfileToggle] = useState(false)
 
-    let arrTDs = [{ label: "Lorem ipsum tomi" }, { label: "ya boi stank oml" }, { label: "spaghetti ohs zos" }];
     const [checkedItems, setCheckedItems] = useState(Array(arrTDs.length).fill(false));
 
     const scale = useSharedValue(0);
@@ -52,14 +62,7 @@ function HomeScreen({ navigation }) {
         transform: [{ translateY: toggleProfileList.value }]
     }))
     // Transfer Page data in here:
-    let cardArr = [
-        { uri: 'https://picsum.photos/700', title: pageTitle },
-        { uri: 'https://picsum.photos/700', title: "Hello World" }
-    ]
-    let privPageArr = [
-        { uri: 'https://picsum.photos/700', title: "Private Page" },
-        { uri: 'https://picsum.photos/700', title: "Software Dev Goals" }
-    ]
+
 
     useEffect(() => {
         scale.value = withTiming(show ? 1 : 0);
@@ -96,16 +99,18 @@ function HomeScreen({ navigation }) {
         <View className="flex">
             <View style={{ opacity: profileToggle ? 0.6 : 1 }}>
                 <FlatList
-                    className="flex-row gap-3 m-2"
+                    className="flex-row gap-5 m-2"
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{ paddingRight: 400 }}
                     horizontal={true}
                     data={cardArr}
-                    keyExtractor={(item, index) => index.toString()}
+                    keyExtractor={(item, index) => item.title + index}
                     renderItem={({ item }) => (
-                        <Card className="w-11/12 h-1/2 top-0 left-0 bg-white" style={{marginLeft: 8}}>
-                            <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} />
-                            <Card.Title title={item.title} style={{ height: '20%' }} />
+                        <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }} key={item.title}>
+                            <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }}/>
+                            <Card.Title title={item.title.length > 35 ? 
+                            item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
+                            : item.title} style={{ height: '20%', width: "100%" }} />
                         </Card>
                     )}
                     onEndReachedThreshold={0.5}
@@ -158,11 +163,13 @@ function HomeScreen({ navigation }) {
                     contentContainerStyle={{ paddingRight: 400 }}
                     horizontal={true}
                     data={privPageArr}
-                    keyExtractor={(item, index) => index.toString()}
+                    keyExtractor={(item, index) => item.title + index}
                     renderItem={({ item }) => (
-                        <Card className="w-3/4 h-1/2 top-0 left-0 bg-white">
+                        <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }} key={item.title}>
                             <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} />
-                            <Card.Title title={item.title} style={{ height: '20%' }} />
+                            <Card.Title title={item.title.length > 35 ? 
+                            item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
+                            : item.title} style={{ height: '20%', width: "100%" }} />
                         </Card>
                     )}
                     onEndReachedThreshold={0.5}

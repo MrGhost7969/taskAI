@@ -1,71 +1,73 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native'
-import { TextInput, Card } from 'react-native-paper';
+import { TextInput, Card, Searchbar } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-export default function SearchPage(){
+import { cardArr, privPageArr } from './Home';
+export default function SearchPage({ navigation }) {
     const [textInput, setText] = useState("")
     const [active, setActive] = useState(false)
     const [page, setPage] = useState([])
-    function searchPress(){
+
+    useEffect(() => {
+        const unfocus = navigation.addListener('focus', () => {
+            setActive(false);
+        });
+        return unfocus;
+    }, [navigation]);
+
+    function searchPress() {
         console.log("Pressed search")
+    }
+    const generateCards = (arr, type) => {
+        return arr.map((name, key) => (
+            <Card mode='elevated' key={key} style={{ backgroundColor: 'white', borderRadius: 15 }}>
+                <Card.Title
+                    title={name.title}
+                    subtitle={`in ${type}`}
+                />
+            </Card>
+        ))
     }
 
     let category = "some category"
-    let pagesArr = [{title: "School Page"}, {title: "Software Engineering"}, {title: "Money money money"}];
+    let pagesArr = [{ title: "School Page" }, { title: "Software Engineering" }, { title: "Money money money" }];
     return (
         <>
             <View className="flex justify-center items-center">
                 <TextInput label={"Search"} className="absolute w-11/12 top-3 bg-gray-200"
-                onChangeText={text => setText(text)} onFocus={() => setActive(!active)} 
-                mode='flat' outlineColor='gray' activeOutlineColor='gray'
-                selectionColor='gray' activeUnderlineColor='transparent' underlineColor='transparent'
-                left={ <TextInput.Icon icon={'magnify'} disabled={textInput === "" ? true : false} onPress={searchPress}/>}
+                    onChangeText={text => setText(text)} onFocus={() => setActive(true)}
+                    mode='flat' outlineColor='gray' activeOutlineColor='gray' value={textInput}
+                    selectionColor='gray' activeUnderlineColor='transparent' underlineColor='transparent'
+                    left={<TextInput.Icon icon={'magnify'} disabled={textInput === "" ? true : false} onPress={searchPress} />}
                 />
             </View>
             {/* Render below under a condition */}
-            <ScrollView className="flex absolute h-full w-full top-28 left-4 gap-10" showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 300}} style={{position: 'absolute'}}>
-                <View className="gap-3">
-                    <View className="flex-row">
-                        <FontAwesomeIcon icon={faStar} color='gold' style={{top: 4, marginRight: 3, left: -4}}/>
-                        <Text className="text-base text-gray-600">Favorites</Text>
+            {!active && textInput === "" ?
+                <ScrollView className="flex absolute h-full w-full top-28 left-4 gap-10" showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ paddingBottom: 300 }} style={{ position: 'absolute' }}>
+                    <View className="gap-3">
+                        <View className="flex-row">
+                            <FontAwesomeIcon icon={faStar} color='gold' style={{ top: 4, marginRight: 3, left: -4 }} />
+                            <Text className="text-base text-gray-600">Favorites</Text>
+                        </View>
+                        {generateCards(pagesArr, category)}
                     </View>
-                    
-                        {pagesArr.map((i, k) => 
-                        <Card mode='elevated' key={k} style={{backgroundColor: 'white', borderRadius: 15}}>
-                            <Card.Title 
-                                title={i.title}
-                                subtitle={`in ${category}`}
-                            />
-                        </Card>
-                        )}
+                    <View className="gap-3">
+                        <Text className="text-base text-gray-600">Today</Text>
+                        {generateCards(cardArr, category)}
+
+                    </View>
+                    <View className="gap-3">
+                        <Text className="text-base text-gray-600">Older</Text>
+                        {generateCards(privPageArr, category)}
+                    </View>
+                </ScrollView>
+                :
+                <View className="absolute left-0 top-20">
+                    <Text>Searching for: {textInput}</Text>
                 </View>
-                <View className="gap-3">
-                    <Text className="text-base text-gray-600">Today</Text>
-                    
-                        {pagesArr.map((i, k) => 
-                        <Card mode='elevated' key={k} style={{backgroundColor: 'white', borderRadius: 15}}>
-                            <Card.Title 
-                                title={i.title}
-                                subtitle={`in ${category}`}
-                            />
-                        </Card>
-                        )}
-                </View>
-                <View className="gap-3">
-                    <Text className="text-base text-gray-600">Older</Text>
-                    
-                    {pagesArr.map((i, k) => 
-                    <Card mode='elevated' key={k} style={{backgroundColor: 'white', borderRadius: 15}}>
-                        <Card.Title 
-                            title={i.title}
-                            subtitle={`in ${category}`}
-                        />
-                    </Card>
-                    )}
-                </View>
-            </ScrollView>
+            }
         </>
     )
 }

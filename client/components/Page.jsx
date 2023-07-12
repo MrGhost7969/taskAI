@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native'
 import { TextInput } from 'react-native-paper';
-
+import { cardArr, privPageArr } from './Home';
 const Page = ({ updateTitle, updateContent }) => {
     const [pageTitle, setPageTitle] = useState('');
     const [pageContent, setPageContent] = useState('');
