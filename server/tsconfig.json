@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "target": "es6",
+    "module": "NodeNext",
+    "esModuleInterop": true,
+    "strict": true,
+    "outDir": "./dist"
+  },
+  "include": [
+    "extensions/**/*.ts", "./app.js", "./chatGPT.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+
