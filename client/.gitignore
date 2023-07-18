@@ -12,6 +12,7 @@ npm-debug.*
 web-build/
 .env
 components/exports/
+app.config.js
 # macOS
 .DS_Store
 
