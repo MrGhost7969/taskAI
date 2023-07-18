@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import { TextInput, Card, Searchbar } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { cardArr, privPageArr } from './Home';
+import { cardArr, privPageArr } from './exports/exports';
 export default function SearchPage({ navigation }) {
     const [textInput, setText] = useState("")
     const [active, setActive] = useState(false)

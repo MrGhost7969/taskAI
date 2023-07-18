@@ -9,6 +9,9 @@ import Settings from './UserOptions/Settings';
 import { Divider } from 'react-native-paper';
 import Profile from './UserOptions/Profile';
 import Animated, { useSharedValue, ZoomIn, ZoomOut, useAnimatedStyle, withSequence, withTiming, withDelay, withSpring, SlideOutDown, FadeOut, FadeInUp, Easing, FadeOutUp, SlideInDown, RotateInDownLeft, RotateOutDownRight, Keyframe } from 'react-native-reanimated'
+
+import { route, cardArr, privPageArr, arrTDs } from './exports/exports';
+import axios from 'axios';
 const Stack = createNativeStackNavigator()
 
 export default function HomeStack() {
@@ -21,18 +24,8 @@ export default function HomeStack() {
     )
 }
 
-export let cardArr = [
-    { uri: 'https://picsum.photos/700', title: "titled untitled" },
-    { uri: 'https://picsum.photos/700', title: "Hello World" }
-]
-export let privPageArr = [
-    { uri: 'https://picsum.photos/700', title: "page of something" },
-    { uri: 'https://picsum.photos/700', title: "Software Development" }
-]
 
-export let arrTDs = [{ label: "Lorem ipsum tomi" }, { label: "ya boi stank oml" }, { label: "spaghetti ohs zos" }];
-
-function HomeScreen({ navigation, pageTitle, pageContent }) {
+function HomeScreen({ navigation }) {
     let name = 'Random person'
     let email = "rando@gmail.com"
 
@@ -63,6 +56,18 @@ function HomeScreen({ navigation, pageTitle, pageContent }) {
     }))
     // Transfer Page data in here:
 
+    const [data, setData] = useState("")
+    useEffect(() => {
+        console.log("Connecting to server")
+        async function fetchServer(){
+            const response = await axios.get(route.dev).then(res => console.log(res.data)).catch(e => console.log(e))
+            setData(response)
+        }
+        console.log(data)
+        fetchServer();
+        console.log(route)
+
+    }, []);
 
     useEffect(() => {
         scale.value = withTiming(show ? 1 : 0);

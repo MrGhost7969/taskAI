@@ -20,8 +20,9 @@ const sendMessagesToGPT = async(input) => {
         const api = new BingChat({
             cookie: process.env.BING_COOKIE
         })
-        const response = await api.sendMessage(input);
-        console.log(response.text)
+        const res = await api.sendMessage(input);
+        console.log(res.text)
+        return res.text
     } catch (error) {
         console.log(error)
         throw error
@@ -37,8 +38,9 @@ app.get('/', (req, res) => {
 app.post('/chat', async (req, res) => {
     let { requestData } = req.body || {};
     console.log('Received request:', requestData);
+    console.log("User input: ", requestData.messages[0].content)
     const userMessage = requestData.messages[0].content
-    res.status(200).send(await sendMessagesToGPT(userMessage))
+    res.status(200).json(await sendMessagesToGPT(userMessage))
 })
 
 app.listen(PORT, () => console.log(`Server started on Port: ${PORT}`))
