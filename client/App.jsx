@@ -9,7 +9,8 @@ import AIPage from './components/AiPage';
 import SearchPage from './components/SearchPage';
 import Page from './components/Page';
 import HomeStack from './components/Home';
-
+import axios from 'axios';
+import { route } from './components/exports/exports';
 const Tab = createBottomTabNavigator();
 
 export default function App() {
@@ -17,7 +18,6 @@ export default function App() {
     let typeOfPage = 'Normal Page'
     let pageName = "Private Page"
     
-
     return (
         <NavigationContainer>
             <Tab.Navigator
@@ -25,15 +25,17 @@ export default function App() {
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ focused, color, size }) => {
                         let iconName;
-
-                        if (route.name === 'Home')
-                            iconName = focused ? faHouse : faHouse;
-                        else if (route.name === 'AI')
-                            iconName = focused ? faComments : faComments;
-                        else if (route.name === 'Search')
-                            iconName = focused ? faMagnifyingGlass : faMagnifyingGlass;
-                        else if (route.name === 'NewPage')
-                            iconName = focused ? faSquarePlus : faSquarePlus;
+                        switch (route.name) {
+                            case 'Home': iconName = focused ? faHouse : faHouse
+                                break;
+                            case 'AI': iconName = focused ? faComments : faComments
+                                break;
+                            case 'Search': iconName = focused ? faMagnifyingGlass : faMagnifyingGlass
+                                break;
+                            case 'NewPage': iconName = focused ? faSquarePlus : faSquarePlus
+                                break;
+                            default: break;
+                        }
                         return <FontAwesomeIcon icon={iconName} size={size} color={color} />
                     },
                     tabBarActiveTintColor: 'black',

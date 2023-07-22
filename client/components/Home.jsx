@@ -1,25 +1,30 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Card, Checkbox } from 'react-native-paper'
+import { Card, Checkbox, TextInput } from 'react-native-paper'
 import { View, Text, ScrollView, Pressable, FlatList } from 'react-native'
-import { faEllipsis, faChevronRight, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis, faChevronRight, faBars, faGear, faPen, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faUser } from '@fortawesome/free-regular-svg-icons';
+import { faEnvelope, faUser } from '@fortawesome/free-regular-svg-icons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Settings from './UserOptions/Settings';
-import { Divider } from 'react-native-paper';
 import Profile from './UserOptions/Profile';
+import { Divider } from 'react-native-paper';
 import Animated, { useSharedValue, ZoomIn, ZoomOut, useAnimatedStyle, withSequence, withTiming, withDelay, withSpring, SlideOutDown, FadeOut, FadeInUp, Easing, FadeOutUp, SlideInDown, RotateInDownLeft, RotateOutDownRight, Keyframe } from 'react-native-reanimated'
 
 import { route, cardArr, privPageArr, arrTDs } from './exports/exports';
 import axios from 'axios';
+import MembersPage from './UserOptions/Members';
+import Trash from './UserOptions/Trash';
 const Stack = createNativeStackNavigator()
 
 export default function HomeStack() {
+    
     return (
         <Stack.Navigator>
             <Stack.Screen name='Home' component={HomeScreen} />
             <Stack.Screen name='Settings' component={Settings} />
-            <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name='Profile' component={Profile} />
+            <Stack.Screen name='Members' component={MembersPage} />
+            <Stack.Screen name='Trash' component={Trash} />
         </Stack.Navigator>
     )
 }
@@ -59,14 +64,11 @@ function HomeScreen({ navigation }) {
     const [data, setData] = useState("")
     useEffect(() => {
         console.log("Connecting to server")
-        async function fetchServer(){
+        async function fetchServer() {
             const response = await axios.get(route.dev).then(res => console.log(res.data)).catch(e => console.log(e))
             setData(response)
         }
-        console.log(data)
         fetchServer();
-        console.log(route)
-
     }, []);
 
     useEffect(() => {
@@ -112,21 +114,23 @@ function HomeScreen({ navigation }) {
                     keyExtractor={(item, index) => item.title + index}
                     renderItem={({ item }) => (
                         <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }} key={item.title}>
-                            <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }}/>
-                            <Card.Title title={item.title.length > 35 ? 
-                            item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
-                            : item.title} style={{ height: '20%', width: "100%" }} />
+                            <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} />
+                            <Card.Title title={item.title.length > 35 ?
+                                item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
+                                : item.title} style={{ height: '20%', width: "100%" }} />
                         </Card>
                     )}
                     onEndReachedThreshold={0.5}
                 />
                 {show && (
                     <Animated.View entering={ZoomIn.duration(50)} exiting={ZoomOut.duration(100)}
-                        className="bg-white p-3 -top-2 right-10 rounded-lg border-slate-800 absolute w-36 h-28 z-20"
+                        className="bg-white p-3 -top-2 right-10 rounded-lg border-slate-800 absolute w-36 h-36"
                         style={[reanimatedStyle]}>
                         <Text onPress={() => navigation.navigate('Settings')} className='my-2'>Settings</Text>
                         <Divider bold={true} style={{ width: 145, right: 12 }} />
-                        <Text onPress={() => navigation.navigate('Profile')} className='my-2'>Profile</Text>
+                        <Text onPress={() => navigation.navigate('Members')} className='my-4'>Members</Text>
+                        <Divider bold={true} style={{ width: 145, right: 12 }} />
+                        <Text onPress={() => navigation.navigate('Trash')} className="my-2">Trash</Text>
                     </Animated.View>
                 )}
                 {/* Important tasks */}
@@ -172,9 +176,9 @@ function HomeScreen({ navigation }) {
                     renderItem={({ item }) => (
                         <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }} key={item.title}>
                             <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} />
-                            <Card.Title title={item.title.length > 35 ? 
-                            item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
-                            : item.title} style={{ height: '20%', width: "100%" }} />
+                            <Card.Title title={item.title.length > 35 ?
+                                item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
+                                : item.title} style={{ height: '20%', width: "100%" }} />
                         </Card>
                     )}
                     onEndReachedThreshold={0.5}
@@ -187,8 +191,18 @@ function HomeScreen({ navigation }) {
                         <View className="bg-gray-300 w-1/12 h-1/4 -top-3 absolute rounded"></View>
                         <Text>Accounts</Text>
                     </View>
-                    <Text className="text-gray-500 font-semibold">{email}</Text>
-                    <Text>Lorem Ipsum text</Text>
+                    <View className="flex-row items-center">
+                        <FontAwesomeIcon icon={faEnvelope} size={18} />
+                        <Text className="text-gray-500 font-semibold ml-2">{email}</Text>
+                        <Pressable onPress={() => console.log("Clicked")}>
+                            <FontAwesomeIcon icon={faPen} size={16} style={{ left: 180 }} />
+                        </Pressable>
+                    </View>
+                    <Divider className="top-5" />
+                    <Pressable onPress={() => navigation.navigate('Profile')} className="flex-row absolute bottom-8 left-5 gap-2 items-center">
+                        <FontAwesomeIcon icon={faGear} />
+                        <Text>Profile Info</Text>
+                    </Pressable>
                 </Animated.View>
             }
         </View>

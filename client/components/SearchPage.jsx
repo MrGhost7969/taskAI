@@ -44,7 +44,7 @@ export default function SearchPage({ navigation }) {
             </View>
             {/* Render below under a condition */}
             {!active && textInput === "" ?
-                <ScrollView className="flex absolute h-full w-full top-28 left-4 gap-10" showsVerticalScrollIndicator={false}
+                <ScrollView className="flex h-full w-full top-28 left-4 gap-10" showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: 300 }} style={{ position: 'absolute' }}>
                     <View className="gap-3">
                         <View className="flex-row">

@@ -4,8 +4,8 @@ import { View, Text, ScrollView, Dimensions, Keyboard } from 'react-native'
 import { TextInput } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFaceSmile } from '@fortawesome/free-regular-svg-icons';
-import Constants from 'expo-constants';
 import { route } from './exports/exports'
+import * as tf from '@tensorflow/tfjs'
 import axios from 'axios';
 export default function AIPage() {
     const [textInput, setText] = useState("")
@@ -15,10 +15,10 @@ export default function AIPage() {
     const [loading, setLoading] = useState(false);
     const [arrInputs, setArrInputs] = useState([]) // store arrInputs in some memory or whatever
     const [arrOutputs, setArrOutputs] = useState([])
+    const [component, setComponent] = useState([]); // array of components generated from tensorflow
     const { control, formState: { errors } } = useForm()
     const scrollViewRef = useRef()
     let name = "User"
-    let aiOut = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     async function sendMessagesChatGPT(requestData) {
         try {
             setLoading(true)
