@@ -3,17 +3,19 @@ dotenv.config();
 import express from 'express'
 import bodyParser from 'body-parser';
 import cors from 'cors'
-import { Configuration, OpenAIApi } from 'openai'
-import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from 'chatgpt';
 import { BingChat } from 'bing-chat';
+import tf from '@tensorflow/tfjs'
 import axios from 'axios'
-import { sendMessagesToApiHub } from './dist/chatGPT.js';
+
 const app = express()
 const PORT = 5000
 
 if (!process.env.OPENAI_API_KEY) console.log("OPENAI_API_KEY not set, skipping chatgpt");
 
 app.use(bodyParser.json());
+
+const model = tf.sequential()
+
 
 const sendMessagesToGPT = async(input) => {
     try {
