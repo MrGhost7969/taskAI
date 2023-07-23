@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Text, View, Pressable, Keyboard } from 'react-native'
+import { Text, View, Pressable, Keyboard, ScrollView } from 'react-native'
 import { TextInput, Chip } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faArrowUpLong, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
@@ -45,23 +45,26 @@ export default function Trash({ navigation }) {
         <>
             {text !== '' ?
                 <View className="flex-row top-4 mx-5 items-center">
-                    <FontAwesomeIcon icon={faMagnifyingGlass}/>
+                    <FontAwesomeIcon icon={faMagnifyingGlass} />
                     <Text className="ml-5 text-base">Related Text</Text>
-                    <FontAwesomeIcon icon={faArrowUpLong} style={{transform: [{rotate: '-45deg'}], left: 210}} size={18}/>
+                    <FontAwesomeIcon icon={faArrowUpLong} style={{ transform: [{ rotate: '-45deg' }], left: 210 }} size={18} />
                 </View>
                 :
                 <>
                     <Animated.View className="flex-row" entering={FadeIn.duration(80)} exiting={FadeOut.duration(80)}>
-                        <Chip className="w-1/4 border-gray-400 top-2 left-4" mode='outlined'>
-                            <Text>Pages</Text>
-                        </Chip>
-                        <Chip className="w-1/4 border-gray-400 top-2 left-6" mode='outlined'>
-                            <Text>Files</Text>
-                        </Chip>
-                        <Chip className="w-2/5 border-gray-400 top-2 left-8" mode='outlined'>
-                            <Text>Photos & images</Text>
-                        </Chip>
+                        <ScrollView horizontal style={{ width: '100%', height: 60 }} contentContainerStyle={{ paddingRight: 300 }} showsHorizontalScrollIndicator={false}>
+                            <Chip className="w-1/3 h-10 border-gray-400 top-2 left-4" mode='outlined'>
+                                <Text>Pages</Text>
+                            </Chip>
+                            <Chip className="w-1/4 h-10 border-gray-400 top-2 left-6" mode='outlined'>
+                                <Text>Files</Text>
+                            </Chip>
+                            <Chip className="w-2/3 h-10 border-gray-400 top-2 left-8" mode='outlined'>
+                                <Text>Photos & images</Text>
+                            </Chip>
+                        </ScrollView>
                     </Animated.View>
+
                     <View className="flex absolute left-20 top-16 w-full h-full">
                         <Text className="text-md">Your trashed files will appear below</Text>
                     </View>
