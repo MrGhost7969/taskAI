@@ -4,7 +4,7 @@ import { Card } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { cardArr, privPageArr } from '../exports/exports';
+import { privatePageState, publicPageState } from '../exports/exports';
 
 type RootStackParamList = {
     Home: undefined,
@@ -14,7 +14,7 @@ interface NewPageProps {
     navigation: StackNavigationProp<RootStackParamList, 'Page'>;
     route: RouteProp<RootStackParamList, 'Page'>;
     propArr: any[];
-    // add onPress
+    onPress: (title: string, uri: string) => void;
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -40,16 +40,11 @@ const NewPage: React.FC<NewPageProps> = ({ route }) => {
     );
 };
 
-export const RowOfCards: React.FC<NewPageProps> = ({navigation, propArr}) => {
-    function navigateToPage(title: string, uri: string){ 
-        console.log("Go to page")
-        navigation.navigate('Page', { pageTitle: title, pageURI: uri })
+export const RowOfCards: React.FC<NewPageProps> = ({navigation, propArr, onPress}) => {
+    if (!propArr || propArr.length === 0) {
+        return <Text>No pages available.</Text>;
     }
-
-    function navigateToPrivatePage(title: string, uri: string) { 
-        console.log("Go to private page")
-        navigation.navigate('Page', { pageTitle: title, pageURI: uri })
-    }
+    console.log("Rendering RowOfCards");
     return(
         <>
             <FlatList
@@ -61,7 +56,7 @@ export const RowOfCards: React.FC<NewPageProps> = ({navigation, propArr}) => {
                 keyExtractor={(item, index) => item.title + index}
                 renderItem={({ item }) => (
                     <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }}
-                    onPress={() => navigateToPage(item.title, item.uri)} key={item.title}>
+                    onPress={() => onPress(item.title, item.uri)} key={item.title}>
                         <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} />
                         <Card.Title title={item.title.length > 35 ?
                             item.title.substring(0, Math.min(item.title.length, 10)).concat("...")

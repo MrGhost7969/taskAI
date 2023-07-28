@@ -3,12 +3,14 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import { TextInput, Card, Searchbar } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { cardArr, privPageArr } from './exports/exports';
+import { publicPageState, privatePageState } from './exports/exports';
 export default function SearchPage({ navigation }) {
     const [textInput, setText] = useState("")
     const [active, setActive] = useState(false)
     const [page, setPage] = useState([])
 
+    const {pubPage, setPubPage} = publicPageState()
+    const {privPage, setPrivPage} = privatePageState()
     useEffect(() => {
         const unfocus = navigation.addListener('focus', () => {
             setActive(false);
@@ -55,12 +57,12 @@ export default function SearchPage({ navigation }) {
                     </View>
                     <View className="gap-3">
                         <Text className="text-base text-gray-600">Today</Text>
-                        {generateCards(cardArr, category)}
+                        {generateCards(pubPage, category)}
 
                     </View>
                     <View className="gap-3">
                         <Text className="text-base text-gray-600">Older</Text>
-                        {generateCards(privPageArr, category)}
+                        {generateCards(privPage, category)}
                     </View>
                 </ScrollView>
                 :

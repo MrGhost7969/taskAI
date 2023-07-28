@@ -9,8 +9,9 @@ import Settings from './UserOptions/Settings';
 import Profile from './UserOptions/Profile';
 import { Divider } from 'react-native-paper';
 import Animated, { useSharedValue, ZoomIn, ZoomOut, useAnimatedStyle, withSequence, withTiming, withDelay, withSpring, SlideOutDown, FadeOut, FadeInUp, Easing, FadeOutUp, SlideInDown, RotateInDownLeft, RotateOutDownRight, Keyframe } from 'react-native-reanimated'
+import { useSelector, useDispatch } from 'react-redux';
 
-import { route, cardArr, privPageArr, arrTDs } from './exports/exports';
+import { route, privatePageState, arrTDs, publicPageState } from './exports/exports';
 import axios from 'axios';
 import MembersPage from './UserOptions/Members';
 import Trash from './UserOptions/Trash';
@@ -18,7 +19,6 @@ import PageStacks, { RowOfCards } from './UserPages/NewPage';
 const Stack = createNativeStackNavigator()
 
 export default function HomeStack() {
-    
     return (
         <Stack.Navigator>
             <Stack.Screen name='Home' component={HomeScreen} />
@@ -26,7 +26,7 @@ export default function HomeStack() {
             <Stack.Screen name='Profile' component={Profile} />
             <Stack.Screen name='Members' component={MembersPage} />
             <Stack.Screen name='Trash' component={Trash} />
-            <Stack.Screen name="PageStack" component={PageStacks}/>
+            <Stack.Screen name="PageStack" component={PageStacks} />
         </Stack.Navigator>
     )
 }
@@ -35,9 +35,8 @@ function HomeScreen({ navigation }) {
     let name = 'Random person'
     let email = "rando@gmail.com"
 
-    // ---------For later-----------
-    // const [pageTitle, setPageTitle] = useState("");  
-    // const [pageContent, setPageContent] = useState("");  
+    const privPage = useSelector((state) => state.privPage);
+    const { pubPage, setPubPage } = publicPageState()
 
     const [show, setShow] = useState(false)
     const [isList, setList] = useState(false);
@@ -61,7 +60,7 @@ function HomeScreen({ navigation }) {
         transform: [{ translateY: toggleProfileList.value }]
     }))
     // Transfer Page data in here:
-
+    const dispatch = useDispatch()
     const [data, setData] = useState("")
     useEffect(() => {
         console.log("Connecting to server")
@@ -102,15 +101,21 @@ function HomeScreen({ navigation }) {
         setList(prev => !prev)
         listAnim.value = withSequence(withTiming(-30, { duration: 200 }), withSpring(2))
     }
-
-    function navigateToPrivatePage(title, uri) { 
-        console.log("Go to private page")
+    function navigateToPage(title, uri) {
+        console.log("Go to page")
         navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
     }
+
+    function navigateToPrivatePage(title, uri) {
+        console.log("Go to private page")
+        dispatch(addPage({ uri, title }));
+        navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
+    }
+
     return (
         <View className="flex">
             <View style={{ opacity: profileToggle ? 0.6 : 1 }}>
-                <RowOfCards propArr={cardArr}/>
+                <RowOfCards propArr={pubPage} onPress={navigateToPage} />
                 {show && (
                     <Animated.View entering={ZoomIn.duration(50)} exiting={ZoomOut.duration(100)}
                         className="bg-white p-3 -top-2 right-10 rounded-lg border-slate-800 absolute w-36 h-36"
@@ -155,30 +160,17 @@ function HomeScreen({ navigation }) {
                     }
                 </View>
                 <Text className="underline underline-offset-2 text-md ml-3">Private Pages</Text>
-                <FlatList
-                    className="flex-row m-2"
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingRight: 400 }}
-                    horizontal={true}
-                    data={privPageArr}
-                    keyExtractor={(item, index) => item.title + index}
-                    renderItem={({ item }) => (
-                        <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }} 
-                        onPress={() => navigateToPrivatePage(item.title, item.uri)} key={item.title}>
-                            <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} />
-                            <Card.Title title={item.title.length > 35 ?
-                                item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
-                                : item.title} style={{ height: '20%', width: "100%" }} />
-                        </Card>
-                    )}
-                    onEndReachedThreshold={0.5}
-                />
+                {privPage.length > 0 ? (
+                    <RowOfCards propArr={privPage} onPress={navigateToPrivatePage} />
+                ) : (
+                    <Text>No private pages available</Text>
+                )}
             </View>
             {profileToggle &&
                 <Animated.View entering={SlideInDown.duration(100)} exiting={SlideOutDown.duration(400)}
                     style={toggleStyle} className="p-5 bg-white absolute bottom-0 w-full h-2/5 flex rounded-lg">
                     <View className="items-center mb-5">
-                        <View className="bg-gray-300 w-1/12 h-1/4 -top-3 absolute rounded"></View>
+                        <View className="bg-gray-300 w-1/12 h-1/4 -top-3 absolute rounded" />
                         <Text>Accounts</Text>
                     </View>
                     <View className="flex-row items-center">
