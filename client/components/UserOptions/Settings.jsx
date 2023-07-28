@@ -28,10 +28,6 @@ export default function Settings({ navigation }) {
         }
     })
 
-    useEffect(() => {
-        console.log(`Online is: ${activity.online.current}
-                    Online text: ${activity.online.text}`)
-    }, [activity])
     return (
         <View className="bg-white h-full w-full">
             <View className="left-4">
@@ -62,16 +58,22 @@ export default function Settings({ navigation }) {
                             style={{ left: 215 }} />
                     </View>
                     <View className="flex-row items-center">
-                        <Pressable onPress={() => setActivityDropDown(!activityDropDown)}>
+                        <Pressable onPress={() => {
+                            console.log("Clicked")
+                            setActivityDropDown(!activityDropDown)
+                        }}>
                             <View className="rounded border-2 border-gray-400" style={{
                                 height: activityDropDown ? 110 : 24,
                                 width: activity.online.current || activity.away.current || activity.do_not_disturb.current ? 200 : 112
                             }}>
-                                <Text className="text-gray-600 ml-2">Activity type: {
-                                    activity.online.current ? activity.online.text :
-                                        activity.away.current ? activity.away.text :
-                                            activity.do_not_disturb.current && activity.do_not_disturb.text
-                                }</Text>
+                                <View className="flex-row">
+                                    <Text className="text-gray-600 ml-2">Activity type: </Text>
+                                    <Text className="ml-3">
+                                            {activity.online.current ? activity.online.text :
+                                                activity.away.current ? activity.away.text :
+                                                    activity.do_not_disturb.current && activity.do_not_disturb.text}
+                                    </Text>
+                                </View>
                                 <FontAwesomeIcon icon={faChevronRight} size={10} style={{ left: 90, top: -14, transform: [{ rotate: '90deg' }] }} />
                             </View>
                         </Pressable>
@@ -81,23 +83,29 @@ export default function Settings({ navigation }) {
                                     console.log("Online")
                                     setActivity(prevState => ({
                                         ...prevState,
-                                        online: { current: true },
+                                        online: { current: !activity.online.current, text: 'Online' },
+                                        away: { current: false },
+                                        do_not_disturb: { content: false },
                                     }))
-                                    }} className="flex-row items-center">
+                                }} className="flex-row items-center">
                                     <View className="w-3 h-3 rounded-full bg-green-400 right-4" />
                                     <Text>Online</Text>
                                 </Pressable>
                                 <Pressable onPress={() => setActivity(prevState => ({
-                                        ...prevState,
-                                        away: { current: true },
-                                    }))} className="flex-row items-center">
+                                    ...prevState,
+                                    online: { current: false },
+                                    away: { current: !activity.away.current, text: 'Away' },
+                                    do_not_disturb: { current: false }
+                                }))} className="flex-row items-center">
                                     <View className="w-3 h-3 rounded-full bg-orange-400 right-4" />
                                     <Text>Away</Text>
                                 </Pressable>
                                 <Pressable onPress={() => setActivity(prevState => ({
-                                        ...prevState,
-                                        do_not_disturb: { current: true }
-                                    }))} className="flex-row items-center">
+                                    ...prevState,
+                                    online: { current: false },
+                                    away: { current: false },
+                                    do_not_disturb: { current: !activity.do_not_disturb.current, text: 'Do Not Disturb' }
+                                }))} className="flex-row items-center">
                                     <View className="w-3 h-3 rounded-full bg-red-500 right-4" />
                                     <Text>DND</Text>
                                 </Pressable>

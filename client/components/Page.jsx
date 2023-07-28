@@ -5,7 +5,7 @@ import { cardArr, privPageArr } from './exports/exports';
 const Page = ({ updateTitle, updateContent }) => {
     const [pageTitle, setPageTitle] = useState('');
     const [pageContent, setPageContent] = useState('');
-
+    // SetpageTitle and setPagecontent should affect NewPage
     return (
         <View className="relative bg-white min-h-screen">
             <View className="items-start left-5 top-10">

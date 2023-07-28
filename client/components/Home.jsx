@@ -14,6 +14,7 @@ import { route, cardArr, privPageArr, arrTDs } from './exports/exports';
 import axios from 'axios';
 import MembersPage from './UserOptions/Members';
 import Trash from './UserOptions/Trash';
+import PageStacks, { RowOfCards } from './UserPages/NewPage';
 const Stack = createNativeStackNavigator()
 
 export default function HomeStack() {
@@ -25,10 +26,10 @@ export default function HomeStack() {
             <Stack.Screen name='Profile' component={Profile} />
             <Stack.Screen name='Members' component={MembersPage} />
             <Stack.Screen name='Trash' component={Trash} />
+            <Stack.Screen name="PageStack" component={PageStacks}/>
         </Stack.Navigator>
     )
 }
-
 
 function HomeScreen({ navigation }) {
     let name = 'Random person'
@@ -102,26 +103,14 @@ function HomeScreen({ navigation }) {
         listAnim.value = withSequence(withTiming(-30, { duration: 200 }), withSpring(2))
     }
 
+    function navigateToPrivatePage(title, uri) { 
+        console.log("Go to private page")
+        navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
+    }
     return (
         <View className="flex">
             <View style={{ opacity: profileToggle ? 0.6 : 1 }}>
-                <FlatList
-                    className="flex-row gap-5 m-2"
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingRight: 400 }}
-                    horizontal={true}
-                    data={cardArr}
-                    keyExtractor={(item, index) => item.title + index}
-                    renderItem={({ item }) => (
-                        <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }} key={item.title}>
-                            <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} />
-                            <Card.Title title={item.title.length > 35 ?
-                                item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
-                                : item.title} style={{ height: '20%', width: "100%" }} />
-                        </Card>
-                    )}
-                    onEndReachedThreshold={0.5}
-                />
+                <RowOfCards propArr={cardArr}/>
                 {show && (
                     <Animated.View entering={ZoomIn.duration(50)} exiting={ZoomOut.duration(100)}
                         className="bg-white p-3 -top-2 right-10 rounded-lg border-slate-800 absolute w-36 h-36"
@@ -174,7 +163,8 @@ function HomeScreen({ navigation }) {
                     data={privPageArr}
                     keyExtractor={(item, index) => item.title + index}
                     renderItem={({ item }) => (
-                        <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }} key={item.title}>
+                        <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }} 
+                        onPress={() => navigateToPrivatePage(item.title, item.uri)} key={item.title}>
                             <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} />
                             <Card.Title title={item.title.length > 35 ?
                                 item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
