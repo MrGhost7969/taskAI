@@ -3,14 +3,14 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import { TextInput, Card, Searchbar } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { publicPageState, privatePageState } from './exports/exports';
+import { useSelector } from 'react-redux';
 export default function SearchPage({ navigation }) {
     const [textInput, setText] = useState("")
     const [active, setActive] = useState(false)
     const [page, setPage] = useState([])
 
-    const {pubPage, setPubPage} = publicPageState()
-    const {privPage, setPrivPage} = privatePageState()
+    const pubPage = useSelector(state => state.pubPage)
+    const privPage = useSelector((state) => state.privPage);
     useEffect(() => {
         const unfocus = navigation.addListener('focus', () => {
             setActive(false);

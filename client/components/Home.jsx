@@ -11,11 +11,12 @@ import { Divider } from 'react-native-paper';
 import Animated, { useSharedValue, ZoomIn, ZoomOut, useAnimatedStyle, withSequence, withTiming, withDelay, withSpring, SlideOutDown, FadeOut, FadeInUp, Easing, FadeOutUp, SlideInDown, RotateInDownLeft, RotateOutDownRight, Keyframe } from 'react-native-reanimated'
 import { useSelector, useDispatch } from 'react-redux';
 
-import { route, privatePageState, arrTDs, publicPageState } from './exports/exports';
+import { route, arrTDs } from './exports/exports';
 import axios from 'axios';
 import MembersPage from './UserOptions/Members';
 import Trash from './UserOptions/Trash';
 import PageStacks, { RowOfCards } from './UserPages/NewPage';
+import { addPrivatePage } from '../reduxFiles/privPageSlice';
 const Stack = createNativeStackNavigator()
 
 export default function HomeStack() {
@@ -35,8 +36,8 @@ function HomeScreen({ navigation }) {
     let name = 'Random person'
     let email = "rando@gmail.com"
 
-    const privPage = useSelector((state) => state.privPage);
-    const { pubPage, setPubPage } = publicPageState()
+    const privPage = useSelector(state => state.privPage);
+    const pubPage = useSelector(state => state.pubPage)
 
     const [show, setShow] = useState(false)
     const [isList, setList] = useState(false);
@@ -108,10 +109,8 @@ function HomeScreen({ navigation }) {
 
     function navigateToPrivatePage(title, uri) {
         console.log("Go to private page")
-        dispatch(addPage({ uri, title }));
         navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
     }
-
     return (
         <View className="flex">
             <View style={{ opacity: profileToggle ? 0.6 : 1 }}>
@@ -160,11 +159,7 @@ function HomeScreen({ navigation }) {
                     }
                 </View>
                 <Text className="underline underline-offset-2 text-md ml-3">Private Pages</Text>
-                {privPage.length > 0 ? (
-                    <RowOfCards propArr={privPage} onPress={navigateToPrivatePage} />
-                ) : (
-                    <Text>No private pages available</Text>
-                )}
+                <RowOfCards propArr={privPage} onPress={navigateToPrivatePage} />
             </View>
             {profileToggle &&
                 <Animated.View entering={SlideInDown.duration(100)} exiting={SlideOutDown.duration(400)}

@@ -6,17 +6,17 @@ import PageStacks, { RowOfCards } from './UserPages/NewPage';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
-import { useDispatch } from 'react-redux';
-import { addPage } from '../reduxFiles/privPageSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { addPrivatePage } from '../reduxFiles/privPageSlice';
 
 const Page = ({ navigation }) => {
     const [pageTitle, setPageTitle] = useState('');
     const [pageContent, setPageContent] = useState('');
     const [active, setActive] = useState(false)
     const [pageImageExamples, setPageImageExamples] = useState(false)
-    const [selectedImageCover, setSelectedImageCover] = useState('')
+    const [selectedImageCover, setSelectedImageCover] = useState("")
     const { isSaved, setIsSaved } = useSaveState()
-    const { privPage, setPrivPage } = privatePageState()
+    const privPage = useSelector(state => state.privPage);
     // SetpageTitle and setPagecontent should affect NewPage
     const dispatch = useDispatch();
     const images = [
@@ -32,9 +32,6 @@ const Page = ({ navigation }) => {
         return unfocus
     }, [navigation]);
 
-    function handleChange(text) {
-        setPageTitle(text)
-    }
     function handleToggle() {
         console.log("Image change")
         Keyboard.dismiss()
@@ -44,36 +41,40 @@ const Page = ({ navigation }) => {
         console.log("Change image!")
         setSelectedImageCover(imageUri)
         setPageImageExamples(false)
+        console.log('Image URL when clicked!', imageUri)
+        console.log(typeof imageUri === 'string')
     }
-    function savePage() {
-        if (selectedImageCover && pageTitle !== '') {
-            dispatch(addPage({ uri: selectedImageCover, title: pageTitle }));
-            setIsSaved(!isSaved)
-            setPageTitle('');
-            setPageContent('');
-            setSelectedImageCover('');
-            setActive(false);
-            console.log("Saved!")
-            console.log(privPage); // Add this line to check privPage after saving
-        } else {
-            console.log("Error!")
-        }
-    }
-    
     useEffect(() => {
-        (active && (pageTitle !== '' || pageContent !== '')) && navigation.setOptions({
+        active && (pageTitle !== '' || pageContent !== '' || selectedImageCover !== "") && navigation.setOptions({
             headerRight: () =>
                 <Pressable onPress={savePage}>
                     <Text className='text-blue-600 right-4 font-bold'>Save</Text>
                 </Pressable>
         })
-    }, [navigation, active, pageTitle, pageContent])
-    console.log(privPage)
+    }, [navigation, active, pageTitle, pageContent, selectedImageCover]);
+
+    function savePage() {
+        console.log(selectedImageCover !== '' && pageTitle !== '')
+        if (active && (pageTitle !== '' || pageContent !== '')) {
+            console.log(privPage);
+            dispatch(addPrivatePage({ uri: selectedImageCover, title: pageTitle }));
+            setIsSaved(!isSaved)
+            setActive(false);
+            setPageTitle('');
+            setPageContent('');
+            console.log("Saved!")
+            setSelectedImageCover("");
+        } else {
+            console.log("Error!")
+        }
+    }
+    console.log(pageTitle)
+    console.log(selectedImageCover)
     return (
         <View className="relative bg-white min-h-screen">
             <View style={{ opacity: pageImageExamples ? 0.4 : 1 }}>
                 {(privPage !== undefined || privPage.length !== 0) &&
-                    selectedImageCover ?
+                    selectedImageCover !== '' ?
                     <Pressable onPress={handleToggle}>
                         <Image source={{ uri: selectedImageCover }}
                             style={{ width: '100%', height: 100 }} />
@@ -86,7 +87,7 @@ const Page = ({ navigation }) => {
                 }
                 <View className="items-start left-5 top-10">
                     <TextInput mode='outlined' numberOfLines={3} className="text-4xl text-gray-300 font-bold w-5/6 right-4"
-                        placeholder='Untitled Page' onChangeText={handleChange} value={pageTitle}
+                        placeholder='Untitled Page' onChangeText={text => setPageTitle(text)} value={pageTitle}
                         activeUnderlineColor='transparent' activeOutlineColor='transparent' outlineColor='transparent'
                         underlineColor='transparent' textColor='black' style={{ backgroundColor: "white" }}
                         placeholderTextColor={'#d1d5db'} onFocus={() => setActive(!active)}

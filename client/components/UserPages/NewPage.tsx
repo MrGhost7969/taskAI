@@ -4,7 +4,6 @@ import { Card } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { privatePageState, publicPageState } from '../exports/exports';
 
 type RootStackParamList = {
     Home: undefined,
@@ -30,9 +29,10 @@ const PageStacks: React.FC<NewPageProps> = ({route}) => {
 
 const NewPage: React.FC<NewPageProps> = ({ route }) => {
     const { pageTitle, pageURI } = route.params;
+    console.log('PageURI value: ', pageURI);
     return (
         <>
-            <Image source={{uri: pageURI}} style={{width: '100%', height: 120}}/>
+            <Image source={{uri: pageURI }} style={{width: '100%', height: 120}}/>
             <Roles roles={[{ name: 'Admin', key: 0 }]} />
             <Text style={{fontSize: 35, left: 15, width: '95%', height: 150}}>{pageTitle}</Text>
             <Text style={{top: 15, left: 15, width: '95%'}}>Page content!</Text>

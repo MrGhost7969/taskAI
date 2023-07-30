@@ -1,17 +1,17 @@
-// privPageSlice.js
-
 import { createSlice } from '@reduxjs/toolkit';
 
 const privPageSlice = createSlice({
   name: 'privPage',
-  initialState: [], // Initial state for privPage
+  initialState: [
+    { uri: "https://picsum.photos/700", title: "page of something" },
+    { uri: "https://picsum.photos/700", title: "Software Development" },
+  ],
   reducers: {
-    addPage: (state, action) => {
-      // The action.payload should be an object with uri and title properties
+    addPrivatePage: (state, action) => {
       state.push(action.payload);
     },
   },
 });
 
-export const { addPage } = privPageSlice.actions;
+export const { addPrivatePage } = privPageSlice.actions;
 export default privPageSlice.reducer;
