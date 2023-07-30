@@ -16,7 +16,6 @@ import axios from 'axios';
 import MembersPage from './UserOptions/Members';
 import Trash from './UserOptions/Trash';
 import PageStacks, { RowOfCards } from './UserPages/NewPage';
-import { addPrivatePage } from '../reduxFiles/privPageSlice';
 const Stack = createNativeStackNavigator()
 
 export default function HomeStack() {
@@ -60,8 +59,6 @@ function HomeScreen({ navigation }) {
     const toggleStyle = useAnimatedStyle(() => ({
         transform: [{ translateY: toggleProfileList.value }]
     }))
-    // Transfer Page data in here:
-    const dispatch = useDispatch()
     const [data, setData] = useState("")
     useEffect(() => {
         console.log("Connecting to server")

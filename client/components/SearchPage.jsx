@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native'
-import { TextInput, Card, Searchbar } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView } from 'react-native'
+import { TextInput, Card } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { useSelector } from 'react-redux';
 export default function SearchPage({ navigation }) {
     const [textInput, setText] = useState("")
     const [active, setActive] = useState(false)
-    const [page, setPage] = useState([])
 
     const pubPage = useSelector(state => state.pubPage)
-    const privPage = useSelector((state) => state.privPage);
+    const privPage = useSelector(state => state.privPage);
     useEffect(() => {
         const unfocus = navigation.addListener('focus', () => {
             setActive(false);

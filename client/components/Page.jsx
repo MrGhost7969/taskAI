@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, Image, FlatList, Keyboard } from 'react-native'
 import { TextInput, Card } from 'react-native-paper';
-import { privatePageState, useSaveState } from './exports/exports';
-import PageStacks, { RowOfCards } from './UserPages/NewPage';
+import { useSaveState } from './exports/exports';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
