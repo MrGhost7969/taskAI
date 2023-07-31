@@ -99,13 +99,11 @@ function HomeScreen({ navigation }) {
         setList(prev => !prev)
         listAnim.value = withSequence(withTiming(-30, { duration: 200 }), withSpring(2))
     }
+    
     function navigateToPage(title, uri) {
         navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
     }
 
-    function navigateToPrivatePage(title, uri) {
-        navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
-    }
     return (
         <View className="flex">
             <View style={{ opacity: profileToggle ? 0.6 : 1 }}>
@@ -154,7 +152,7 @@ function HomeScreen({ navigation }) {
                     }
                 </View>
                 <Text className="underline underline-offset-2 text-md ml-3">Private Pages</Text>
-                <RowOfCards propArr={privPage} onPress={navigateToPrivatePage} />
+                <RowOfCards propArr={privPage} onPress={navigateToPage} />
             </View>
             {profileToggle &&
                 <Animated.View entering={SlideInDown.duration(100)} exiting={SlideOutDown.duration(400)}
