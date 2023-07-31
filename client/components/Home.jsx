@@ -15,7 +15,7 @@ import { route, arrTDs } from './exports/exports';
 import axios from 'axios';
 import MembersPage from './UserOptions/Members';
 import Trash from './UserOptions/Trash';
-import PageStacks, { RowOfCards } from './UserPages/NewPage';
+import PageStack, { RowOfCards } from './UserPages/NewPage';
 const Stack = createNativeStackNavigator()
 
 export default function HomeStack() {
@@ -26,7 +26,7 @@ export default function HomeStack() {
             <Stack.Screen name='Profile' component={Profile} />
             <Stack.Screen name='Members' component={MembersPage} />
             <Stack.Screen name='Trash' component={Trash} />
-            <Stack.Screen name="PageStack" component={PageStacks} />
+            <Stack.Screen name="PageStack" component={PageStack} options={{headerTitle: "Page"}}/>
         </Stack.Navigator>
     )
 }
@@ -100,12 +100,10 @@ function HomeScreen({ navigation }) {
         listAnim.value = withSequence(withTiming(-30, { duration: 200 }), withSpring(2))
     }
     function navigateToPage(title, uri) {
-        console.log("Go to page")
         navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
     }
 
     function navigateToPrivatePage(title, uri) {
-        console.log("Go to private page")
         navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
     }
     return (

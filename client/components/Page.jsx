@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Pressable, Image, FlatList, Keyboard } from 'react-native'
 import { TextInput, Card } from 'react-native-paper';
 import { useSaveState } from './exports/exports';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
-import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown, useAnimatedStyle, useSharedValue, withDelay, withSequence, withTiming } from 'react-native-reanimated';
 import { useDispatch, useSelector } from 'react-redux';
 import { addPrivatePage } from '../reduxFiles/privPageSlice';
 
@@ -16,14 +16,20 @@ const Page = ({ navigation }) => {
     const [selectedImageCover, setSelectedImageCover] = useState("")
     const { isSaved, setIsSaved } = useSaveState()
     const privPage = useSelector(state => state.privPage);
+    const saveButton = useSharedValue(0)
     // SetpageTitle and setPagecontent should affect NewPage
     const dispatch = useDispatch();
     const images = [
         { uri: 'https://picsum.photos/600' },
         { uri: 'https://picsum.photos/700' },
         { uri: 'https://wallpapercave.com/wp/wp6202709.jpg' },
-        { uri: 'https://th.bing.com/th/id/OIP.1i0IPWWGz00AQLMy0cK7QwHaEK?pid=ImgDet&rs=1' }
+        { uri: 'https://th.bing.com/th/id/OIP.1i0IPWWGz00AQLMy0cK7QwHaEK?pid=ImgDet&rs=1' },
+        { uri: 'https://c4.wallpaperflare.com/wallpaper/851/501/292/minimalism-programming-code-wallpaper-preview.jpg' },
+        { uri: 'https://static.wikia.nocookie.net/baki/images/a/a2/Yujiro%27s_Demon_Back.jpg/revision/latest?cb=20200715084726' }
     ];
+    const saveButtonAnim = useAnimatedStyle(() => ({
+        opacity: saveButton.value 
+    }))
     useEffect(() => {
         const unfocus = navigation.addListener('focus', () => {
             setActive(false)
@@ -44,11 +50,14 @@ const Page = ({ navigation }) => {
         console.log(typeof imageUri === 'string')
     }
     useEffect(() => {
-        active && (pageTitle !== '' || pageContent !== '' || selectedImageCover !== "") && navigation.setOptions({
-            headerRight: () =>
-                <Pressable onPress={savePage}>
-                    <Text className='text-blue-600 right-4 font-bold'>Save</Text>
+        const isEmpty = pageTitle !== '' || pageContent !== '';
+        active && (isEmpty || selectedImageCover !== "") && navigation.setOptions({
+            headerRight: () => 
+                <Pressable onPress={savePage} >
+                    <Text style={{color: !isEmpty ? '#93C5FD' : 'rgb(37 99 235)'}} 
+                    className='right-4 font-bold'>Save</Text>
                 </Pressable>
+            
         })
     }, [navigation, active, pageTitle, pageContent, selectedImageCover]);
 
@@ -59,16 +68,18 @@ const Page = ({ navigation }) => {
             dispatch(addPrivatePage({ uri: selectedImageCover, title: pageTitle }));
             setIsSaved(!isSaved)
             setActive(false);
-            setPageTitle('');
-            setPageContent('');
+            setPageTitle('')
+            setPageContent('')
+            setSelectedImageCover('')
             console.log("Saved!")
-            setSelectedImageCover("");
+            console.log("Saved is:", isSaved);
         } else {
             console.log("Error!")
         }
     }
-    console.log(pageTitle)
-    console.log(selectedImageCover)
+    useEffect(() => {
+        saveButton.value = withSequence(withTiming(1), withDelay(1000, withTiming(0)))
+    }, [isSaved]);
     return (
         <View className="relative bg-white min-h-screen">
             <View style={{ opacity: pageImageExamples ? 0.4 : 1 }}>
@@ -119,6 +130,12 @@ const Page = ({ navigation }) => {
                             </Pressable>
                         )}
                     />
+                </Animated.View>
+            }
+            {isSaved &&
+                <Animated.View style={saveButtonAnim} entering={FadeIn.duration(100)} exiting={FadeOut.duration(100)}
+                    className='bg-gray-600 w-56 h-14 rounded-md flex items-center absolute justify-center left-20 bottom-56'>
+                    <Text className='text-white'>Saved!</Text>
                 </Animated.View>
             }
         </View>

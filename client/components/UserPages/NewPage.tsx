@@ -13,12 +13,13 @@ interface NewPageProps {
     navigation: StackNavigationProp<RootStackParamList, 'Page'>;
     route: RouteProp<RootStackParamList, 'Page'>;
     propArr: any[];
-    onPress: (title: string, uri: string) => void;
+    onPress: (title?: string, uri?: string) => void;
+    subtitle?: string
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
-const PageStacks: React.FC<NewPageProps> = ({route}) => {
+const PageStack: React.FC<NewPageProps> = ({route}) => {
     return(
         <Stack.Navigator>
             <Stack.Screen name='Page' component={NewPage} initialParams={route.params}
@@ -44,7 +45,6 @@ export const RowOfCards: React.FC<NewPageProps> = ({navigation, propArr, onPress
     if (!propArr || propArr.length === 0) {
         return <Text>No pages available.</Text>;
     }
-    console.log("Rendering RowOfCards");
     return(
         <>
             <FlatList
@@ -68,9 +68,19 @@ export const RowOfCards: React.FC<NewPageProps> = ({navigation, propArr, onPress
         </>
     )
 }
+export const PageColumn: React.FC<NewPageProps> = ({propArr, subtitle, onPress}) => {
+    return propArr.map((item, key) => (
+        <Card mode='elevated' key={key} onPress={() => onPress(item.title, item.uri)} style={{ backgroundColor: 'white', borderRadius: 15, marginBottom: 6, marginTop: 7 }}>
+            <Card.Title
+                title={item.title}
+                subtitle={`in ${subtitle}`}
+            />
+        </Card>
+    ))
+}
 const Roles = ({ roles }: { roles: [{ name: string; key?: any }] }) => {
     return <Text>{roles[0].name}</Text>;
 };
 
 
-export default PageStacks
+export default PageStack

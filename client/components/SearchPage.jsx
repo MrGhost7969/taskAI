@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, ScrollView, FlatList } from 'react-native'
 import { TextInput, Card } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { useSelector } from 'react-redux';
+import { PageColumn } from './UserPages/NewPage';
 export default function SearchPage({ navigation }) {
     const [textInput, setText] = useState("")
     const [active, setActive] = useState(false)
 
     const pubPage = useSelector(state => state.pubPage)
     const privPage = useSelector(state => state.privPage);
+    let pagesArr = [{ title: "School Page" }, { title: "Software Engineering" }, { title: "Money money money" }];
+
+    const query = [pubPage, privPage, pagesArr]
     useEffect(() => {
         const unfocus = navigation.addListener('focus', () => {
             setActive(false);
@@ -20,19 +24,11 @@ export default function SearchPage({ navigation }) {
     function searchPress() {
         console.log("Pressed search")
     }
-    const generateCards = (arr, type) => {
-        return arr.map((name, key) => (
-            <Card mode='elevated' key={key} style={{ backgroundColor: 'white', borderRadius: 15 }}>
-                <Card.Title
-                    title={name.title}
-                    subtitle={`in ${type}`}
-                />
-            </Card>
-        ))
+    function navigateToPage(title, uri) {
+        navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
     }
 
     let category = "some category"
-    let pagesArr = [{ title: "School Page" }, { title: "Software Engineering" }, { title: "Money money money" }];
     return (
         <>
             <View className="flex justify-center items-center">
@@ -52,21 +48,36 @@ export default function SearchPage({ navigation }) {
                             <FontAwesomeIcon icon={faStar} color='gold' style={{ top: 4, marginRight: 3, left: -4 }} />
                             <Text className="text-base text-gray-600">Favorites</Text>
                         </View>
-                        {generateCards(pagesArr, category)}
+                        <PageColumn onPress={navigateToPage} subtitle={category} propArr={pagesArr} />
                     </View>
                     <View className="gap-3">
                         <Text className="text-base text-gray-600">Today</Text>
-                        {generateCards(pubPage, category)}
-
+                        <PageColumn onPress={navigateToPage} subtitle={category} propArr={pubPage} />
                     </View>
                     <View className="gap-3">
                         <Text className="text-base text-gray-600">Older</Text>
-                        {generateCards(privPage, category)}
+                        <PageColumn onPress={navigateToPage} subtitle={category} propArr={privPage} />
                     </View>
                 </ScrollView>
                 :
-                <View className="absolute left-0 top-20">
+                <View className="absolute left-5 top-20 w-11/12">
                     <Text>Searching for: {textInput}</Text>
+                    <FlatList
+                        data={query}
+                        keyExtractor={(item, index) => index.toString()} // Add keyExtractor
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 200 }}
+                        renderItem={({ item, index }) => {
+                            const matchingPages = item.filter(item => item.title === textInput || item.title.includes(textInput));
+                            if (matchingPages.length > 0 && textInput !== "") {
+                                return (
+                                    <View key={index}>
+                                        <PageColumn propArr={matchingPages} />
+                                    </View>
+                                );
+                            }
+                        }}
+                    />
                 </View>
             }
         </>
