@@ -9,6 +9,7 @@ import AIPage from './components/AiPage';
 import SearchPage from './components/SearchPage';
 import CreatePage from './components/CreatePage';
 import HomeStack from './components/Home';
+import AuthPage from './components/AuthPage'
 import axios from 'axios';
 import { route } from './components/exports/exports';
 import store from './reduxFiles/store';
@@ -25,7 +26,7 @@ export default function App() {
         <Provider store={store}>
             <NavigationContainer>
                 <Tab.Navigator
-                    initialRouteName='Home'
+                    initialRouteName='AuthPage'
                     screenOptions={({ route }) => ({
                         tabBarIcon: ({ focused, color, size }) => {
                             let iconName;
@@ -45,8 +46,10 @@ export default function App() {
                         tabBarActiveTintColor: 'black',
                         tabBarInactiveTintColor: 'gray',
                         headerTitleAlign: 'center',
+                        tabBarStyle: {display: route.name === 'AuthPage' ? 'none' : 'flex'}
                     })}
                 >
+                    <Tab.Screen name='AuthPage' component={AuthPage} options={{ headerTitle: "Task AI" }} />
                     <Tab.Screen name={"Home"} component={HomeStack} options={{ headerShown: false }} />
                     <Tab.Screen name={"AI"} component={AIPage} options={{ headerTitle: "Task AI" }} />
                     <Tab.Screen name={"Search"} component={SearchPage} />

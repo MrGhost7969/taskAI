@@ -4,7 +4,7 @@ import { View, Text, ScrollView, Pressable, FlatList } from 'react-native'
 import { faEllipsis, faChevronRight, faBars, faGear, faPen, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEnvelope, faUser } from '@fortawesome/free-regular-svg-icons';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, getFocusedRouteNameFromRoute } from '@react-navigation/native-stack';
 import Settings from './UserOptions/Settings';
 import Profile from './UserOptions/Profile';
 import { Divider } from 'react-native-paper';
