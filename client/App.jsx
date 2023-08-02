@@ -7,7 +7,7 @@ import { faHouse, faComments, faMagnifyingGlass, faSquarePlus, faBars } from '@f
 
 import AIPage from './components/AiPage';
 import SearchPage from './components/SearchPage';
-import Page from './components/Page';
+import CreatePage from './components/CreatePage';
 import HomeStack from './components/Home';
 import axios from 'axios';
 import { route } from './components/exports/exports';
@@ -36,7 +36,7 @@ export default function App() {
                                     break;
                                 case 'Search': iconName = focused ? faMagnifyingGlass : faMagnifyingGlass
                                     break;
-                                case 'NewPage': iconName = focused ? faSquarePlus : faSquarePlus
+                                case 'New Page': iconName = focused ? faSquarePlus : faSquarePlus
                                     break;
                                 default: break;
                             }
@@ -50,7 +50,7 @@ export default function App() {
                     <Tab.Screen name={"Home"} component={HomeStack} options={{ headerShown: false }} />
                     <Tab.Screen name={"AI"} component={AIPage} options={{ headerTitle: "Task AI" }} />
                     <Tab.Screen name={"Search"} component={SearchPage} />
-                    <Tab.Screen name={"NewPage"} component={Page}
+                    <Tab.Screen name={"New Page"} component={CreatePage}
                         options={{
                             headerRight: () => (<Text className="absolute right-3">Type: {typeOfPage}</Text>),
                             headerLeft: () => (<Text className="absolute left-3">In page: {pageName}</Text>),

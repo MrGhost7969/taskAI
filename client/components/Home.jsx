@@ -100,8 +100,8 @@ function HomeScreen({ navigation }) {
         listAnim.value = withSequence(withTiming(-30, { duration: 200 }), withSpring(2))
     }
     
-    function navigateToPage(title, uri) {
-        navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
+    function navigateToPage(title, content, uri) {
+        navigation.navigate('PageStack', { pageTitle: title, pageContent: content, pageURI: uri });
     }
 
     return (

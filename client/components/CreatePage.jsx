@@ -8,7 +8,7 @@ import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown, useAnimatedStyle,
 import { useDispatch, useSelector } from 'react-redux';
 import { addPrivatePage } from '../reduxFiles/privPageSlice';
 
-const Page = ({ navigation }) => {
+export default function CreatePage ({ navigation }) {
     const [pageTitle, setPageTitle] = useState('');
     const [pageContent, setPageContent] = useState('');
     const [active, setActive] = useState(false)
@@ -35,7 +35,7 @@ const Page = ({ navigation }) => {
             setActive(false)
         })
         return unfocus
-    }, [navigation]);
+    }, [navigation, active]);
 
     function handleToggle() {
         console.log("Image change")
@@ -50,22 +50,25 @@ const Page = ({ navigation }) => {
         console.log(typeof imageUri === 'string')
     }
     useEffect(() => {
-        const isEmpty = pageTitle !== '' || pageContent !== '';
+        const isEmpty = pageTitle !== '' && pageContent !== '';
+        console.log('Page title state is:', pageTitle !== '')
+        console.log('Page content state is:', pageContent !== '')
         active && (isEmpty || selectedImageCover !== "") && navigation.setOptions({
             headerRight: () => 
-                <Pressable onPress={savePage} >
+                <Pressable onPress={() => savePage(pageTitle, pageContent, selectedImageCover)} >
                     <Text style={{color: !isEmpty ? '#93C5FD' : 'rgb(37 99 235)'}} 
                     className='right-4 font-bold'>Save</Text>
                 </Pressable>
-            
         })
     }, [navigation, active, pageTitle, pageContent, selectedImageCover]);
 
-    function savePage() {
-        console.log(selectedImageCover !== '' && pageTitle !== '')
-        if (active && (pageTitle !== '' || pageContent !== '')) {
+    function savePage(pageTitle, pageContent, pageURI) {
+        console.log('onPress: Page title state is:', pageTitle !== '')
+        console.log('onPress: Page content state is:', pageContent !== '')
+        console.log('onPress: Page URI state is:', pageURI !== '');
+        if ((pageTitle !== '' && pageContent !== '') || pageURI !== '') {
             console.log(privPage);
-            dispatch(addPrivatePage({ uri: selectedImageCover, title: pageTitle }));
+            dispatch(addPrivatePage({ uri: pageURI, title: pageTitle, content: pageContent }));
             setIsSaved(!isSaved)
             setActive(false);
             setPageTitle('')
@@ -141,5 +144,3 @@ const Page = ({ navigation }) => {
         </View>
     )
 }
-
-export default Page

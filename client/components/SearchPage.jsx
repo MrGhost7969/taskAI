@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CommonActions } from '@react-navigation/native';
 import { View, Text, ScrollView, FlatList } from 'react-native'
 import { TextInput, Card } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -24,8 +25,8 @@ export default function SearchPage({ navigation }) {
     function searchPress() {
         console.log("Pressed search")
     }
-    function navigateToPage(title, uri) {
-        navigation.navigate('PageStack', { pageTitle: title, pageURI: uri })
+    function navigateToPage(title, content, uri) {
+        navigation.navigate('PageStack', { pageTitle: title, pageURI: uri, pageContent: content })
     }
 
     let category = "some category"

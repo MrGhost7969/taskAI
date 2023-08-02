@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
+      "forceConsistentCasingInFileNames": true,
         "lib": [
+          "ESNext",
           "dom",
           "dom.iterable",
-          "ESNext"
+          "scripthost"
         ],
         "target": "ESNext",
       },

@@ -3,8 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const privPageSlice = createSlice({
   name: 'privPage',
   initialState: [
-    { uri: "https://picsum.photos/700", title: "page of something" },
-    { uri: "https://picsum.photos/700", title: "Software Development" },
+    { uri: "https://picsum.photos/700", title: "page of something", content: "Lorem ipsum long text thingy jiggy" },
+    { uri: "https://picsum.photos/700", title: "Software Development", content: "Lorem ipsum but its not long text thingy jiggy" },
   ],
   reducers: {
     addPrivatePage: (state, action) => {
