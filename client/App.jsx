@@ -9,12 +9,12 @@ import AIPage from './components/AiPage';
 import SearchPage from './components/SearchPage';
 import CreatePage from './components/CreatePage';
 import HomeStack from './components/Home';
-import AuthPage from './components/AuthPage'
 import axios from 'axios';
 import { route } from './components/exports/exports';
 import store from './reduxFiles/store';
 
 import { Provider } from 'react-redux';
+import AuthPageStack from './components/AuthPage';
 const Tab = createBottomTabNavigator();
 
 export default function App() {
@@ -49,7 +49,7 @@ export default function App() {
                         tabBarStyle: {display: route.name === 'AuthPage' ? 'none' : 'flex'}
                     })}
                 >
-                    <Tab.Screen name='AuthPage' component={AuthPage} options={{ headerTitle: "Task AI" }} />
+                    <Tab.Screen name='AuthPage' component={AuthPageStack} options={{ headerShown: false }} />
                     <Tab.Screen name={"Home"} component={HomeStack} options={{ headerShown: false }} />
                     <Tab.Screen name={"AI"} component={AIPage} options={{ headerTitle: "Task AI" }} />
                     <Tab.Screen name={"Search"} component={SearchPage} />
