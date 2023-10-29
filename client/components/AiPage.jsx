@@ -32,7 +32,14 @@ export default function AIPage() {
             setLoading(false)
         }
     }
-
+    const checkWord = (str, word) => {
+        // When the user hits the space bar, it'll seperate words into separate strings
+        let words = str.split(' ')
+        console.log(`User inputs array: ${words}`)
+        // returns true if the words array contains the word input (it could be "flowchart" or "diagram", etc)
+        console.log(`Words array contains the word? ${words.includes(word)}`)
+        return words.includes(word)
+    }
     async function sendRequest(e) {
         e.preventDefault();
         Keyboard.dismiss()
@@ -46,7 +53,7 @@ export default function AIPage() {
         setArrOutputs(prevValue => [...prevValue, response])
         console.log(response)
     }
-    
+
     useEffect(() => {
         async function fetchData() {
             const getResponse = axios.get(route.dev).then(res => console.log(res.data))
@@ -61,14 +68,16 @@ export default function AIPage() {
         <View className="flex-1">
             <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }} style={{ marginBottom: 70 }}
                 ref={scrollViewRef} onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}>
-                {arrInputs.map((inputList, key) =>
+                {arrInputs.map((userInput, key) =>
                     <>
-                        <Text key={key} className="text-lg items-start m-10 mr-24 mt-4">{inputList}</Text>
-                            <View className="flex-row mt-4 bg-white w-full min-h-min max-h-fit justify-center" key={key + 1}>
-                                <FontAwesomeIcon icon={faFaceSmile} style={{ marginTop: 40, marginLeft: 30 }} size={29} />
-                                <Text className="m-10 mr-12 text-lg">{loading && key === arrInputs.length - 1
+                        <Text key={key} className="text-lg items-start m-10 mr-24 mt-4">{userInput}</Text>
+                        <View className="flex-row mt-4 bg-white w-full min-h-min max-h-fit justify-center" key={key + 1}>
+                            <FontAwesomeIcon icon={faFaceSmile} style={{ marginTop: 40, marginLeft: 30 }} size={29} />
+                            <Text className="m-10 mr-12 text-lg">{loading && key === arrInputs.length - 1
                                 ? "Loading..." : arrOutputs[key]}</Text>
-                            </View>
+                        </View>
+                        {checkWord(userInput, 'flowchart') && <CustomFlowChart inputs={userInput}/>}
+                        {checkWord(userInput, 'datatable') && <DataTable inputs={userInput}/>}
                     </>
                 )}
             </ScrollView>
@@ -86,4 +95,32 @@ export default function AIPage() {
             </View>
         </View>
     );
+}
+function DataTable({inputs}){
+    console.log("Generate datatable!")
+    return(
+        <>
+            <View className='w-10 h-10 border-4 border-black justify-center items-center'>
+                <Text>{inputs}</Text>
+            </View>
+        </>
+    )
+}
+function CustomFlowChart({inputs}) {
+    console.log("Generate flowchart")
+    return (
+        <>
+            <View className="bg-blue-500 rounded-2xl w-32 h-14 justify-center items-center">
+                <Text className='text-white'>{inputs}</Text>
+            </View>
+            <View className='w-1 h-20 bg-black'/>
+            <View className='bg-red-500 w-20 h-20 rotate-45 justify-center items-center'>
+                <Text className='-rotate-45 text-white'>Condition</Text>
+            </View>
+            <View className='w-1 h-20 bg-black'/>
+            <View className='bg-yellow-500 w-20 h-20 rounded-full justify-center items-center'>
+                <Text className='text-white'>Connecter</Text>
+            </View>
+        </>
+    )
 }

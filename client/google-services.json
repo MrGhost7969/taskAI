@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "219629694817",
+    "project_id": "pivotal-essence-396402",
+    "storage_bucket": "pivotal-essence-396402.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219629694817:android:a1b66be27de943fc8d9f20",
+        "android_client_info": {
+          "package_name": "com.taskAI"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "219629694817-llajrtvrlhj7u2u4ggup5vudv9lvtqqj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.taskAI",
+            "certificate_hash": "421557630d61c04d4de689782ebe5f0320e3fbd4"
+          }
+        },
+        {
+          "client_id": "219629694817-oge1qp1vk2lqdnrdsh245m81patsravb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFXNu742LPoLxU3FjGe3_Uns3MvZHvzsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "219629694817-oge1qp1vk2lqdnrdsh245m81patsravb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "219629694817-4e15bl6nj65vn0a5f25are5l2liuirbn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.taskAI"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

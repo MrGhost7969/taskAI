@@ -15,8 +15,9 @@ import store from './reduxFiles/store';
 
 import { Provider } from 'react-redux';
 import AuthPageStack from './components/AuthPage';
+import { createStackNavigator } from '@react-navigation/stack';
 const Tab = createBottomTabNavigator();
-
+const Stack = createStackNavigator()
 export default function App() {
 
     let typeOfPage = 'Normal Page'
@@ -49,7 +50,7 @@ export default function App() {
                         tabBarStyle: {display: route.name === 'AuthPage' ? 'none' : 'flex'}
                     })}
                 >
-                    <Tab.Screen name='AuthPage' component={AuthPageStack} options={{ headerShown: false }} />
+                    {/* <Stack.Screen name={'AuthPage'} component={AuthPageStack} options={{ headerShown: false }} /> */}
                     <Tab.Screen name={"Home"} component={HomeStack} options={{ headerShown: false }} />
                     <Tab.Screen name={"AI"} component={AIPage} options={{ headerTitle: "Task AI" }} />
                     <Tab.Screen name={"Search"} component={SearchPage} />
@@ -63,6 +64,5 @@ export default function App() {
                 </Tab.Navigator>
             </NavigationContainer>
         </Provider>
-
     );
 }
