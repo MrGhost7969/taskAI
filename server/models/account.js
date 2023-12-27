@@ -4,11 +4,13 @@ import passportLocalMongoose from 'passport-local-mongoose'
 const Schema = mongoose.Schema;
 
 const Account = new Schema({
-    username: String,
-    email: { type: String, required: false },
-    password: String
+    email: {
+        type: String,
+        unique: true,
+        required: true
+    }
 })
 
-Account.plugin(passportLocalMongoose);
+Account.plugin(passportLocalMongoose, {usernameField: 'email'});
 
-module.exports = mongoose.model('Account', Account)
+export default mongoose.model('Account', Account)
