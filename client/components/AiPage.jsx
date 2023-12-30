@@ -19,11 +19,20 @@ export default function AIPage() {
     const { control, formState: { errors } } = useForm()
     const scrollViewRef = useRef()
     let name = "User"
-    async function sendMessagesChatGPT(requestData) {
+    useEffect(() => {
+        async function fetchData() {
+            const getResponse = axios.get(route.dev).then(res => console.log(res.data))
+                .catch(e => console.log(e));
+
+            setTextData(getResponse)
+        }
+        fetchData();
+    }, []);
+    async function sendMessagesChatGPT(userRequest) {
         try {
             setLoading(true)
-            const res = await axios.post(`${route.dev}/chat`, { requestData });
-            console.log(res.data)
+            const res = await axios.post(`${route.dev}/chat`, { userRequest });
+            console.log(`AI output: ${res.data}`)
             return res.data
         } catch (error) {
             console.log("== error ==", error);
@@ -38,32 +47,32 @@ export default function AIPage() {
         console.log(`User inputs array: ${words}`)
         // returns true if the words array contains the word input (it could be "flowchart" or "diagram", etc)
         console.log(`Words array contains the word? ${words.includes(word)}`)
+
         return words.includes(word)
     }
+    
     async function sendRequest(e) {
         e.preventDefault();
         Keyboard.dismiss()
         setPress(!press)
         setArrInputs(oldArr => [...oldArr, textInput])
         setText("")
-        const requestData = {
-            messages: [{ role: 'user', content: textInput }]
-        }
-        const response = await sendMessagesChatGPT(requestData)
+        const response = await sendMessagesChatGPT(textInput);
         setArrOutputs(prevValue => [...prevValue, response])
-        console.log(response)
     }
+    const sortInputs = (userInput) => {
+        console.log(`User input LIST(?): ${userInput}`);
 
-    useEffect(() => {
-        async function fetchData() {
-            const getResponse = axios.get(route.dev).then(res => console.log(res.data))
-                .catch(e => console.log(e));
 
-            setTextData(getResponse)
-        }
-        fetchData();
-    }, []);
-
+        /*
+            todo:
+            - interpret the words from the user and sort them in a flowchart based on the type of information it is (decision, sequence, etc)
+            
+            * Utilize ChatGPT Neural network
+            * Iterate through userInput
+            
+        */
+    }    
     return (
         <View className="flex-1">
             <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }} style={{ marginBottom: 70 }}
@@ -76,8 +85,8 @@ export default function AIPage() {
                             <Text className="m-10 mr-12 text-lg">{loading && key === arrInputs.length - 1
                                 ? "Loading..." : arrOutputs[key]}</Text>
                         </View>
-                        {checkWord(userInput, 'flowchart') && <CustomFlowChart inputs={userInput}/>}
-                        {checkWord(userInput, 'datatable') && <DataTable inputs={userInput}/>}
+                        {checkWord(userInput.toLowerCase(), 'flowchart') && <CustomFlowChart inputs={userInput}/>}
+                        {checkWord(userInput.toLowerCase(), 'datatable') && <CustomDataTable inputs={userInput}/>}
                     </>
                 )}
             </ScrollView>
@@ -96,7 +105,7 @@ export default function AIPage() {
         </View>
     );
 }
-function DataTable({inputs}){
+function CustomDataTable({inputs}){
     console.log("Generate datatable!")
     return(
         <>
