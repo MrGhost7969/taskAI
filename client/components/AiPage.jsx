@@ -7,6 +7,7 @@ import { faFaceSmile } from '@fortawesome/free-regular-svg-icons';
 import { route } from './exports/exports'
 import * as tf from '@tensorflow/tfjs'
 import axios from 'axios';
+
 export default function AIPage() {
     const [textInput, setText] = useState("")
     const [active, setActive] = useState(false)
@@ -47,7 +48,8 @@ export default function AIPage() {
         console.log(`User inputs array: ${words}`)
         // returns true if the words array contains the word input (it could be "flowchart" or "diagram", etc)
         console.log(`Words array contains the word? ${words.includes(word)}`)
-
+        // root node, and subnodes
+        
         return words.includes(word)
     }
 
@@ -60,17 +62,26 @@ export default function AIPage() {
         const response = await sendMessagesChatGPT(textInput);
         setArrOutputs(prevValue => [...prevValue, response])
     }
-    const sortInputs = (userInput) => {
-        console.log(`User input LIST(?): ${userInput}`);
-
-
+    const sortOutput = () => {
+        arrOutputs.map((botOut, key) => { // decision tree algo premise
+            if(botOut[key] === "condition"){
+                // do something
+            } else if(botOut[key] === 'iteration'){
+                // do something else
+            } else if(botOut[key] === 'recursive'){
+                // do other thing
+            } else {
+                // do something if nothing works
+            }
+        })
         /*
             todo:
             - interpret the words from the user and sort them in a flowchart based on the type of information it is (decision, sequence, etc)
-            
+
             * Utilize ChatGPT Neural network
             * Iterate through userInput
             * Use the decision tree algorithm for text classification and random forest for optmization
+            * Limit the amount of trees generated while have low bias and optimal run times
             
         */
     }
@@ -86,6 +97,7 @@ export default function AIPage() {
                             <Text className="m-10 mr-12 text-lg">{loading && key === arrInputs.length - 1
                                 ? "Loading..." : arrOutputs[key]}</Text>
                         </View>
+                        {/* Check if the user types "flowchart" or "datable" and display that */}
                         {checkWord(userInput.toLowerCase(), 'flowchart') && <CustomFlowChart inputs={userInput} />}
                         {checkWord(userInput.toLowerCase(), 'datatable') && <CustomDataTable inputs={userInput} />}
                     </>

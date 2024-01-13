@@ -12,7 +12,7 @@ export default function CreateProfile({ navigation }) {
     const [passwordState, setPasswordState] = useState('')
     const [active, setActive] = useState(false)
     const [registerInfo, setRegisterInfo] = useState('')
-    const [message, setMessage] = useState('')
+    const [registeredMessage, setRegisteredMessage] = useState('')
     useEffect(() => {
         async function fetchResponse() {
             console.log("Fetching register GET req...")
@@ -31,7 +31,7 @@ export default function CreateProfile({ navigation }) {
                 console.log("Before register post request")
                 const registerResponse = await axios.post(`${route.dev}/register`, { emailState, passwordState });
                 console.log("Registration successful:", registerResponse.data);
-                setMessage(registerResponse.data)
+                setRegisteredMessage(registerResponse.data)
                 return registerResponse.data;
             } catch (error) {
                 console.log(`There's an issue: ${error}`);
@@ -39,7 +39,7 @@ export default function CreateProfile({ navigation }) {
         } else {
             console.log("Can't register!");
         }
-        console.log(message)
+        console.log(registeredMessage)
     }
 
     const labelColor = {

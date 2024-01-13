@@ -64,6 +64,7 @@ function HomeScreen({ navigation }) {
         console.log("Connecting to server")
         async function fetchServer() {
             const response = await axios.get(route.dev).then(res => console.log(res.data)).catch(e => console.log(e))
+            console.log(`From home: ${(route.dev)}`)
             setData(response)
         }
         fetchServer();
