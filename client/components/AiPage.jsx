@@ -2,13 +2,31 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useForm, Form } from 'react-hook-form';
 import { View, Text, ScrollView, Dimensions, Keyboard } from 'react-native'
 import { TextInput } from 'react-native-paper';
+import { useSaveState } from './exports/exports';
+import CustomFlowChart from './Custom_Diagrams/CustomFlowChart.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFaceSmile } from '@fortawesome/free-regular-svg-icons';
-import { route } from './exports/exports'
+import { route } from './exports/exports.js'
 import * as tf from '@tensorflow/tfjs'
 import axios from 'axios';
 
+/*
+    todo:
+    - interpret the words from the user and sort them in a flowchart based on the type of information it is (decision, sequence, etc)
+    * Utilize ChatGPT Neural network
+    * Iterate through userInput
+    * Use the decision tree algorithm for text classification and random forest for optmization
+    * Limit the amount of trees generated while have low bias and optimal run times          
+*/
+
 export default function AIPage() {
+    const [dummyArr, setDummyArr] = useState(["Start", "Condition", "Process", "End"])
+    // const [dummyArr, setDummyArr] = useState([
+    //     { content: "Start", key: 0 },
+    //     { content: "Decision", key: 1 },
+    //     { content: "Process", key: 2 },
+    //     { content: "End", key: 3 }
+    // ])
     const [textInput, setText] = useState("")
     const [active, setActive] = useState(false)
     const [press, setPress] = useState(false)
@@ -16,24 +34,18 @@ export default function AIPage() {
     const [loading, setLoading] = useState(false);
     const [arrInputs, setArrInputs] = useState([]) // store arrInputs in some memory or whatever
     const [arrOutputs, setArrOutputs] = useState([])
-    const [component, setComponent] = useState([]); // array of components generated from tensorflow
+    const { isSaved, setIsSaved } = useSaveState()
     const { control, formState: { errors } } = useForm()
     const scrollViewRef = useRef()
     let name = "User"
-    useEffect(() => {
-        async function fetchData() {
-            const getResponse = axios.get(route.dev).then(res => console.log(res.data))
-                .catch(e => console.log(e));
 
-            setTextData(getResponse)
-        }
-        fetchData();
-    }, []);
-    async function sendMessagesChatGPT(textInput) {
+    const sendMessagesChatGPT = async (textInput) => {
+        console.log(`Chat route: ${route}`)
         try {
             setLoading(true)
-            const res = await axios.post(`${route.dev}/chat`, { textInput });
+            const res = await axios.post(`${route}/chat`, { textInput: textInput });
             console.log(`AI output: ${res.data}`)
+            console.log(`Text input POST request AFTER: ${textInput}`)
             return res.data
         } catch (error) {
             console.log("== error ==", error);
@@ -49,7 +61,7 @@ export default function AIPage() {
         // returns true if the words array contains the word input (it could be "flowchart" or "diagram", etc)
         console.log(`Words array contains the word? ${words.includes(word)}`)
         // root node, and subnodes
-        
+
         return words.includes(word)
     }
 
@@ -62,45 +74,52 @@ export default function AIPage() {
         const response = await sendMessagesChatGPT(textInput);
         setArrOutputs(prevValue => [...prevValue, response])
     }
+    async function dummyRequest(e) { // for testing purposes
+        e.preventDefault()
+        Keyboard.dismiss()
+        setPress(!press)
+        setArrInputs(oldArr => [...oldArr, textInput])
+        setText("")
+        setDummyArr([...dummyArr])
+    }
+
+    function saveGPTResponseAsPage(input) {
+        
+    }
     const sortOutput = () => {
         arrOutputs.map((botOut, key) => { // decision tree algo premise
-            if(botOut[key] === "condition"){
+            if (botOut[key] === "condition") {
                 // do something
-            } else if(botOut[key] === 'iteration'){
+            } else if (botOut[key] === 'iteration') {
                 // do something else
-            } else if(botOut[key] === 'recursive'){
+            } else if (botOut[key] === 'recursive') {
                 // do other thing
             } else {
                 // do something if nothing works
             }
         })
-        /*
-            todo:
-            - interpret the words from the user and sort them in a flowchart based on the type of information it is (decision, sequence, etc)
 
-            * Utilize ChatGPT Neural network
-            * Iterate through userInput
-            * Use the decision tree algorithm for text classification and random forest for optmization
-            * Limit the amount of trees generated while have low bias and optimal run times
-            
-        */
     }
     return (
         <View className="flex-1">
             <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }} style={{ marginBottom: 70 }}
                 ref={scrollViewRef} onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}>
                 {arrInputs.map((userInput, key) =>
-                    <>
+                    <React.Fragment key={key}>
                         <Text key={key} className="text-lg items-start m-10 mr-24 mt-4">{userInput}</Text>
-                        <View className="flex-row mt-4 bg-white w-full min-h-min max-h-fit justify-center" key={key + 1}>
-                            <FontAwesomeIcon icon={faFaceSmile} style={{ marginTop: 40, marginLeft: 30 }} size={29} />
-                            <Text className="m-10 mr-12 text-lg">{loading && key === arrInputs.length - 1
-                                ? "Loading..." : arrOutputs[key]}</Text>
+                        <View className="flex-row mt-4 bg-white w-full max-h-fit justify-center " key={`${key}_view`}>
+                            <FontAwesomeIcon icon={faFaceSmile} style={{ position: 'absolute', top: 40, left: 10 }} size={29} />
+                            <Text className="m-10 mr-12 text-lg">
+                                {loading && key === arrInputs.length - 1
+                                    ? "Loading..." : (checkWord(userInput.toLowerCase(), 'flowchart'))
+                                    || (checkWord(userInput.toLowerCase(), 'datatable')) &&
+                                    dummyArr[key]}
+                            </Text>
+                            {/* Check if the user types "flowchart" or "datable" and display that */}
+                            {checkWord(userInput.toLowerCase(), 'flowchart') && <CustomFlowChart inputs={dummyArr} />}
+                            {checkWord(userInput.toLowerCase(), 'datatable') && <CustomDataTable inputs={userInput} />}
                         </View>
-                        {/* Check if the user types "flowchart" or "datable" and display that */}
-                        {checkWord(userInput.toLowerCase(), 'flowchart') && <CustomFlowChart inputs={userInput} />}
-                        {checkWord(userInput.toLowerCase(), 'datatable') && <CustomDataTable inputs={userInput} />}
-                    </>
+                    </React.Fragment>
                 )}
             </ScrollView>
             <View className="justify-center items-center">
@@ -110,7 +129,7 @@ export default function AIPage() {
                         className="w-11/12 bottom-7 absolute" mode='outlined' outlineColor='black' value={textInput}
                         activeOutlineColor='gray' onFocus={() => setActive(true)} style={{ backgroundColor: 'white' }}
                         right={
-                            <TextInput.Icon icon={"play"} disabled={textInput === "" ? true : false} onPress={sendRequest} />
+                            <TextInput.Icon icon={"play"} disabled={textInput === "" ? true : false} onPress={dummyRequest} />
                         }
                     />
                 )} />
@@ -124,24 +143,6 @@ function CustomDataTable({ inputs }) {
         <>
             <View className='w-10 h-10 border-4 border-black justify-center items-center'>
                 <Text>{inputs}</Text>
-            </View>
-        </>
-    )
-}
-function CustomFlowChart({ inputs }) {
-    console.log("Generate flowchart")
-    return (
-        <>
-            <View className="bg-blue-500 rounded-2xl w-32 h-14 justify-center items-center">
-                <Text className='text-white'>{inputs}</Text>
-            </View>
-            <View className='w-1 h-20 bg-black' />
-            <View className='bg-red-500 w-20 h-20 rotate-45 justify-center items-center'>
-                <Text className='-rotate-45 text-white'>Condition</Text>
-            </View>
-            <View className='w-1 h-20 bg-black' />
-            <View className='bg-yellow-500 w-20 h-20 rounded-full justify-center items-center'>
-                <Text className='text-white'>Connecter</Text>
             </View>
         </>
     )
