@@ -49,7 +49,8 @@ export default function CreatePage ({ navigation }) {
         console.log('Image URL when clicked!', imageUri)
         console.log(typeof imageUri === 'string')
     }
-    useEffect(() => {
+
+    useEffect(() => { // Save button pop up
         const isEmpty = pageTitle !== '' && pageContent !== '';
         console.log('Page title state is:', pageTitle !== '')
         console.log('Page content state is:', pageContent !== '')
@@ -62,13 +63,14 @@ export default function CreatePage ({ navigation }) {
         })
     }, [navigation, active, pageTitle, pageContent, selectedImageCover]);
 
-    function savePage(pageTitle, pageContent, pageURI) {
+    function savePage (pageTitle, pageContent, pageURI) {
         console.log('onPress: Page title state is:', pageTitle !== '')
         console.log('onPress: Page content state is:', pageContent !== '')
         console.log('onPress: Page URI state is:', pageURI !== '');
         if ((pageTitle !== '' && pageContent !== '') || pageURI !== '') {
             console.log(privPage);
             dispatch(addPrivatePage({ uri: pageURI, title: pageTitle, content: pageContent }));
+            // set all states to default
             setIsSaved(!isSaved)
             setActive(false);
             setPageTitle('')
@@ -81,7 +83,7 @@ export default function CreatePage ({ navigation }) {
         }
     }
     useEffect(() => {
-        saveButton.value = withSequence(withTiming(1), withDelay(1000, withTiming(0)))
+        saveButton.value = withSequence(withTiming(1), withDelay(1000, withTiming(0))) // save button animation
     }, [isSaved]);
     return (
         <View className="relative bg-white min-h-screen">

@@ -57,6 +57,7 @@ export default function AIPage() {
     const checkWord = (str, word) => {
         // When the user hits the space bar, it'll seperate words into separate strings
         let words = str.split(' ')
+        // const lines = str.split('\n').filter(line => line.trim() !== '');
         console.log(`User inputs array: ${words}`)
         // returns true if the words array contains the word input (it could be "flowchart" or "diagram", etc)
         console.log(`Words array contains the word? ${words.includes(word)}`)
@@ -72,54 +73,33 @@ export default function AIPage() {
         setArrInputs(oldArr => [...oldArr, textInput])
         setText("")
         const response = await sendMessagesChatGPT(textInput);
-        setArrOutputs(prevValue => [...prevValue, response])
-    }
-    async function dummyRequest(e) { // for testing purposes
-        e.preventDefault()
-        Keyboard.dismiss()
-        setPress(!press)
-        setArrInputs(oldArr => [...oldArr, textInput])
-        setText("")
-        setDummyArr([...dummyArr])
+        if (arrInputs.some(userInput => checkWord(userInput.toLowerCase(), 'flowchart'))) {
+            console.log("Flowchart is in there! " + checkWord(userInput.toLowerCase(), 'flowchart'));
+            const [, ...rest] = response
+            setArrOutputs(rest); // Set arrOutputs to a new array containing only the latest response
+        } else {
+            setArrOutputs(prevValue => [...prevValue, response]);
+        }
     }
 
     function saveGPTResponseAsPage(input) {
-        
-    }
-    const sortOutput = () => {
-        arrOutputs.map((botOut, key) => { // decision tree algo premise
-            if (botOut[key] === "condition") {
-                // do something
-            } else if (botOut[key] === 'iteration') {
-                // do something else
-            } else if (botOut[key] === 'recursive') {
-                // do other thing
-            } else {
-                // do something if nothing works
-            }
-        })
 
     }
+
     return (
         <View className="flex-1">
             <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }} style={{ marginBottom: 70 }}
                 ref={scrollViewRef} onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}>
                 {arrInputs.map((userInput, key) =>
-                    <React.Fragment key={key}>
-                        <Text key={key} className="text-lg items-start m-10 mr-24 mt-4">{userInput}</Text>
-                        <View className="flex-row mt-4 bg-white w-full max-h-fit justify-center " key={`${key}_view`}>
-                            <FontAwesomeIcon icon={faFaceSmile} style={{ position: 'absolute', top: 40, left: 10 }} size={29} />
-                            <Text className="m-10 mr-12 text-lg">
-                                {loading && key === arrInputs.length - 1
-                                    ? "Loading..." : (checkWord(userInput.toLowerCase(), 'flowchart'))
-                                    || (checkWord(userInput.toLowerCase(), 'datatable')) &&
-                                    dummyArr[key]}
-                            </Text>
-                            {/* Check if the user types "flowchart" or "datable" and display that */}
-                            {checkWord(userInput.toLowerCase(), 'flowchart') && <CustomFlowChart inputs={dummyArr} />}
-                            {checkWord(userInput.toLowerCase(), 'datatable') && <CustomDataTable inputs={userInput} />}
-                        </View>
-                    </React.Fragment>
+                    <TaskAIOutput
+                        arrInputsState={arrInputs}
+                        userInput={userInput} key={key}
+                        flowchartMethod={checkWord(userInput.toLowerCase(), 'flowchart')}
+                        dataTableMethod={checkWord(userInput.toLowerCase(), 'datatable')}
+                        loadingState={loading}
+                        flowchartOutput={arrOutputs}
+                        flowchartOutputKey={arrOutputs[key]}
+                    />
                 )}
             </ScrollView>
             <View className="justify-center items-center">
@@ -129,13 +109,32 @@ export default function AIPage() {
                         className="w-11/12 bottom-7 absolute" mode='outlined' outlineColor='black' value={textInput}
                         activeOutlineColor='gray' onFocus={() => setActive(true)} style={{ backgroundColor: 'white' }}
                         right={
-                            <TextInput.Icon icon={"play"} disabled={textInput === "" ? true : false} onPress={dummyRequest} />
+                            <TextInput.Icon icon={"play"} disabled={textInput === "" ? true : false} onPress={sendRequest} />
                         }
                     />
                 )} />
             </View>
         </View>
     );
+}
+function TaskAIOutput({ arrInputsState, userInput, flowchartMethod, dataTableMethod, loadingState, flowchartOutput, flowchartOutputKey }, key) {
+    console.log(`TaskAI output: ${flowchartOutputKey}`);
+    console.log(`Task AI output array: ${flowchartOutput}`);
+    return (
+        <React.Fragment key={key}>
+            <Text key={key} className="text-lg items-start m-10 mr-24 mt-4">{userInput}</Text>
+            <View className="flex-row mt-4 bg-white w-full max-h-fit justify-center " key={`${key}_view`}>
+                <FontAwesomeIcon icon={faFaceSmile} style={{ position: 'absolute', top: 40, left: 10 }} size={29} />
+                <Text className="m-10 mr-12 text-lg">
+                    {loadingState && key === arrInputsState.length - 1
+                        ? "Loading..." : (!flowchartMethod || dataTableMethod) && flowchartOutputKey}
+                </Text>
+                {/* Check if the user types "flowchart" or "datable" and display that */}
+                {flowchartMethod && <CustomFlowChart inputs={flowchartOutput} />}
+                {dataTableMethod && <CustomDataTable inputs={userInput} />}
+            </View>
+        </React.Fragment>
+    )
 }
 function CustomDataTable({ inputs }) {
     console.log("Generate datatable!")
@@ -147,3 +146,13 @@ function CustomDataTable({ inputs }) {
         </>
     )
 }
+
+// for testing purposes
+// async function dummyRequest(e) {
+//  e.preventDefault()
+//  Keyboard.dismiss()
+//  setPress(!press)
+//  setArrInputs(oldArr => [...oldArr, textInput])
+//  setText("")
+//  setDummyArr([...dummyArr])
+// }

@@ -110,10 +110,11 @@ export default function CustomFlowChart({ inputs }) {
 }
 
 function FlowChartBlocks({ output, style }, key) {
+
     return (
         <View
             style={style}
-            className="w-32 h-14 justify-center items-center"
+            className="w-32 h-fit justify-center items-center p-4"
             key={`${key}_flowchart`}
         >
             <Text className={`text-white ${output === "Decision" && '-rotate-45'}`} key={`${key}_outText`}>
