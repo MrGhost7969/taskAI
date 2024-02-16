@@ -26,7 +26,7 @@ export default function HomeStack() {
             <Stack.Screen name='Profile' component={Profile} />
             <Stack.Screen name='Members' component={MembersPage} />
             <Stack.Screen name='Trash' component={Trash} />
-            <Stack.Screen name="PageStack" component={PageStack} options={{headerTitle: "Page"}}/>
+            <Stack.Screen name="PageStack" component={PageStack} options={{ headerTitle: "Page" }} />
         </Stack.Navigator>
     )
 }
@@ -60,12 +60,18 @@ function HomeScreen({ navigation }) {
         transform: [{ translateY: toggleProfileList.value }]
     }))
     const [data, setData] = useState("")
+    
     useEffect(() => {
         console.log("Connecting to server")
         async function fetchServer() {
-            const response = await axios.get(route).then(res => console.log(res.data)).catch(e => console.log(e))
-            console.log(`From home: ${(route)}`)
-            setData(response)
+            try {
+                const response = await axios.get(`http://${route}/`)
+                console.log(`GET Api data from HOME: ${response.data}`)
+                setData(response)
+                return response;
+            } catch (error) {
+                console.log(`Error from HOME: ${error}`)
+            }
         }
         fetchServer();
     }, []);
@@ -100,7 +106,7 @@ function HomeScreen({ navigation }) {
         setList(prev => !prev)
         listAnim.value = withSequence(withTiming(-30, { duration: 200 }), withSpring(2))
     }
-    
+
     function navigateToPage(title, content, uri) {
         navigation.navigate('PageStack', { pageTitle: title, pageContent: content, pageURI: uri });
     }

@@ -23,7 +23,7 @@ import { View, Text } from 'react-native';
                   by a hold and finger drag (also enables the user to edit content of the block)
                  
 */
-export default function CustomFlowChart({ inputs }) {
+export default function CustomFlowChart({ flowchartInputs }) {
     console.log("Generate flowchart");
     // Initialize the blockStyle state as an array of objects with default style
     let style = {
@@ -32,19 +32,19 @@ export default function CustomFlowChart({ inputs }) {
         transform: "rotate(0deg)",
     };
     const [blockStyle, setBlockStyle] = useState(
-        inputs.map(() => ({ ...style, }))
+        flowchartInputs.map(() => ({ ...style, }))
     );
 
     useEffect(() => {
         const changeBlockDesign = () => {
             // Use map() to return a new array of objects with updated styles
-            const newBlockStyle = inputs.map((output) => {
+            const newBlockStyle = flowchartInputs.map((output) => {
 
                 // Check for specific conditions and update style accordingly
                 if (output[0] !== "") {
                     console.log("This is the first element");
                 }
-                if (output === "Condition") {
+                if (output === "(condition)") {
                     console.log("It's a decision!");
                     style = {
                         backgroundColor: "rgb(239 68 68)",
@@ -56,7 +56,7 @@ export default function CustomFlowChart({ inputs }) {
                     };
                 }
 
-                if (output === "Process") {
+                if (output === "(process)") {
                     console.log("It's a process!");
                     style = {
                         backgroundColor: "rgb(234 179 8)",
@@ -65,7 +65,7 @@ export default function CustomFlowChart({ inputs }) {
                     };
                 }
 
-                if (output === "End") {
+                if (output === "(end)") {
                     style = {
                         backgroundColor: "rgb(109 40 217)",
                         borderRadius: 16
@@ -77,22 +77,22 @@ export default function CustomFlowChart({ inputs }) {
         };
 
         changeBlockDesign();
-    }, [inputs]);
+    }, [flowchartInputs]);
+
 
     return (
         <>
             <View className="flex flex-col relative justify-center items-center right-11">
-                {inputs.map((output, key) => (
+                {flowchartInputs.map((output, key) => (
                     <React.Fragment key={key}>
                         {output[0] === "" && <View className="w-1 h-16 bg-black block -z-10" />}
-                        {/* Use the blockStyle array to access the style object for each element */}
                         {output === 'Condition' ? (
                             <View className='flex-row items-center'>
                                 <View className="w-20 h-14 justify-center items-center bg-orange-500 rounded-2xl">
                                     <Text className='text-white'>True</Text>
                                 </View>
                                 <View className="w-16 h-1 bg-black block -z-10" />
-                                <FlowChartBlocks key={key} output={output} style={blockStyle[key]} />
+                                <FlowChartBlocks key={key} output={output[key]} style={blockStyle[key]} /> {/* Use the blockStyle array to access the style object for each element */}
                                 <View className="w-16 h-1 bg-black block -z-10" />
                                 <View className="w-20 h-14 justify-center items-center bg-orange-500 rounded-2xl">
                                     <Text className='text-white'>False</Text>

@@ -21,29 +21,36 @@ import axios from 'axios';
 
 export default function AIPage() {
     const [dummyArr, setDummyArr] = useState(["Start", "Condition", "Process", "End"])
-    // const [dummyArr, setDummyArr] = useState([
-    //     { content: "Start", key: 0 },
-    //     { content: "Decision", key: 1 },
-    //     { content: "Process", key: 2 },
-    //     { content: "End", key: 3 }
-    // ])
     const [textInput, setText] = useState("")
     const [active, setActive] = useState(false)
     const [press, setPress] = useState(false)
     const [textData, setTextData] = useState('')
     const [loading, setLoading] = useState(false);
     const [arrInputs, setArrInputs] = useState([]) // store arrInputs in some memory or whatever
-    const [arrOutputs, setArrOutputs] = useState([])
+    const [textOutputs, setTextOutputs] = useState([])
+    const [flowchartArrOutput, setFlowchartArrOutput] = useState([])
     const { isSaved, setIsSaved } = useSaveState()
     const { control, formState: { errors } } = useForm()
     const scrollViewRef = useRef()
     let name = "User"
 
+    useEffect(() => {
+        async function fetchChatServer(){
+            try {
+                const getChatRoute = await axios.get(`http://${route}/chat`)
+                console.log(`GET Api data from AIPAGE: ${getChatRoute.data}`)
+                return getChatRoute;
+            } catch (error) {
+                console.log(`Cannot GET chat route. Details: ${error}`)
+            }
+        }
+        fetchChatServer()
+    }, [])
     const sendMessagesChatGPT = async (textInput) => {
         console.log(`Chat route: ${route}`)
         try {
             setLoading(true)
-            const res = await axios.post(`${route}/chat`, { textInput: textInput });
+            const res = await axios.post(`http://${route}/chat`, { textInput: textInput });
             console.log(`AI output: ${res.data}`)
             console.log(`Text input POST request AFTER: ${textInput}`)
             return res.data
@@ -73,13 +80,16 @@ export default function AIPage() {
         setArrInputs(oldArr => [...oldArr, textInput])
         setText("")
         const response = await sendMessagesChatGPT(textInput);
-        if (arrInputs.some(userInput => checkWord(userInput.toLowerCase(), 'flowchart'))) {
-            console.log("Flowchart is in there! " + checkWord(userInput.toLowerCase(), 'flowchart'));
-            const [, ...rest] = response
-            setArrOutputs(rest); // Set arrOutputs to a new array containing only the latest response
+        const includesTextFollowedByNewline = /\S+\n/.test(response);
+        if(checkWord(textInput.toLowerCase(), 'flowchart')){
+            if (response.includes('\n') && includesTextFollowedByNewline) {
+                setTextOutputs(prevValue => [...prevValue, ...response.split('\n')]);
+            } else {
+                setTextOutputs(prevValue => [...prevValue, response])
+            }
         } else {
-            setArrOutputs(prevValue => [...prevValue, response]);
-        }
+            setTextOutputs(prevValue => [...prevValue, response])
+        }   
     }
 
     function saveGPTResponseAsPage(input) {
@@ -94,11 +104,11 @@ export default function AIPage() {
                     <TaskAIOutput
                         arrInputsState={arrInputs}
                         userInput={userInput} key={key}
-                        flowchartMethod={checkWord(userInput.toLowerCase(), 'flowchart')}
+                        inputContainsFlowchart={checkWord(userInput.toLowerCase(), 'flowchart')}
                         dataTableMethod={checkWord(userInput.toLowerCase(), 'datatable')}
                         loadingState={loading}
-                        flowchartOutput={arrOutputs}
-                        flowchartOutputKey={arrOutputs[key]}
+                        flowchartOutput={textOutputs}
+                        textOutputKey={textOutputs[key]}
                     />
                 )}
             </ScrollView>
@@ -117,9 +127,9 @@ export default function AIPage() {
         </View>
     );
 }
-function TaskAIOutput({ arrInputsState, userInput, flowchartMethod, dataTableMethod, loadingState, flowchartOutput, flowchartOutputKey }, key) {
-    console.log(`TaskAI output: ${flowchartOutputKey}`);
-    console.log(`Task AI output array: ${flowchartOutput}`);
+function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, inputContainsFlowchart, inputContainsDatatable, loadingState, flowchartOutput, flowchartMethod }, key) {
+    console.log(`TaskAI inputs array: ${[arrInputsState]}`)
+    console.log(`TaskAI output: ${textOutputKey}`);
     return (
         <React.Fragment key={key}>
             <Text key={key} className="text-lg items-start m-10 mr-24 mt-4">{userInput}</Text>
@@ -127,11 +137,11 @@ function TaskAIOutput({ arrInputsState, userInput, flowchartMethod, dataTableMet
                 <FontAwesomeIcon icon={faFaceSmile} style={{ position: 'absolute', top: 40, left: 10 }} size={29} />
                 <Text className="m-10 mr-12 text-lg">
                     {loadingState && key === arrInputsState.length - 1
-                        ? "Loading..." : (!flowchartMethod || dataTableMethod) && flowchartOutputKey}
+                        ? "Loading..." : (!inputContainsFlowchart || inputContainsDatatable) && textOutputKey}
                 </Text>
                 {/* Check if the user types "flowchart" or "datable" and display that */}
-                {flowchartMethod && <CustomFlowChart inputs={flowchartOutput} />}
-                {dataTableMethod && <CustomDataTable inputs={userInput} />}
+                {inputContainsFlowchart && <CustomFlowChart flowchartInputs={flowchartOutput} />}
+                {inputContainsDatatable && <CustomDataTable inputs={userInput} />}
             </View>
         </React.Fragment>
     )
