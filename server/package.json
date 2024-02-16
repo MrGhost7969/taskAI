@@ -22,7 +22,7 @@
     "firebase": "^10.3.1",
     "mongoose": "^7.5.2",
     "node-fetch": "^3.3.1",
-    "openai": "^4.24.1",
+    "openai": "^4.27.0",
     "passport": "^0.6.0",
     "passport-google-oauth2": "^0.2.0",
     "passport-google-oidc": "^0.1.0",

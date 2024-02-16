@@ -19,6 +19,7 @@ const app = express()
 const PORT = 5000
 
 // app.use('../routes/googleOauth', googleOAuth);
+app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(session({
@@ -65,11 +66,17 @@ app.get("/", (req, res) => {
 })
 
 // Chatbot
+app.get('/chat', async (req, res) => {
+    res.send("Chat route CONNECTED")
+    console.log("Chat route is connected from console!")
+})
 app.post('/chat', async (req, res) => {
-    const { userRequest } = req.body || {};
+    const { textInput } = req.body || {};
+    console.log(`Text input here: ${textInput}`)
     const userId = crypto.randomUUID();
     const taskAIAssistant = await openai.beta.assistants.retrieve(process.env.OPENAI_ASSISTANT_ID);
     console.log(`User id BEFORE: ${userId} and thread by user id: ${threadByUser[userId]}`)
+    console.log(`User input: ${JSON.stringify(textInput)}`);
     // Create a new thread if it's the user's first message
     if (!threadByUser[userId]) {
         try {
@@ -90,7 +97,7 @@ app.post('/chat', async (req, res) => {
             threadByUser[tempUserId], // Use the stored thread ID for this user
             {
                 role: "user",
-                content: userRequest,
+                content: textInput,
             }
         );
         console.log("This is the message object: ", userMessage, "\n");
@@ -109,13 +116,14 @@ app.post('/chat', async (req, res) => {
             console.log(`This is the run retrieve object: ${JSON.stringify(assistantRun)}`);
         }
         // Get the Assistant's response
-        const assistantResponse = await openai.beta.threads.messages.list(threadByUser[tempUserId]);
-        assistantResponse.body.data.forEach(response => {
+        const getAssistantResponse = await openai.beta.threads.messages.list(threadByUser[tempUserId]);
+        getAssistantResponse.body.data.forEach(response => {
             console.log("This is the assistant's response: ", response.content, "\n");
         });
         console.log(`User id AFTER: ${tempUserId} and thready by user id: ${threadByUser[tempUserId]}`)
         // Send the response back to the front-end
-        res.json({ response: assistantResponse.body.data[0].content[0].text.value });
+        const postAssistantResponse = getAssistantResponse.body.data[0].content[0].text.value 
+        res.status(200).send(postAssistantResponse);
     } catch (error) {
         console.error("Error running the assistant:", error);
         res.status(500).json({ error: "Internal server error" });
