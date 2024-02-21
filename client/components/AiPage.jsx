@@ -1,14 +1,19 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useForm, Form } from 'react-hook-form';
-import { View, Text, ScrollView, Dimensions, Keyboard } from 'react-native'
+import { View, Text, ScrollView, Dimensions, Keyboard, TouchableOpacity, Pressable, TouchableWithoutFeedback } from 'react-native'
 import { TextInput } from 'react-native-paper';
 import { useSaveState } from './exports/exports';
 import CustomFlowChart from './Custom_Diagrams/CustomFlowChart.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faFaceSmile } from '@fortawesome/free-regular-svg-icons';
+import { faFaceSmile, faFile } from '@fortawesome/free-regular-svg-icons';
 import { route } from './exports/exports.js'
+import { useDispatch, useSelector } from 'react-redux';
+import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown, useAnimatedStyle, useSharedValue, withDelay, withSequence, withTiming } from 'react-native-reanimated';
+import { addPrivatePage } from '../reduxFiles/privPageSlice';
+
 import * as tf from '@tensorflow/tfjs'
 import axios from 'axios';
+import { faArrowsSpin, faPager, faPen, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 /*
     todo:
@@ -35,9 +40,9 @@ export default function AIPage() {
     let name = "User"
 
     useEffect(() => {
-        async function fetchChatServer(){
+        async function fetchChatServer() {
             try {
-                const getChatRoute = await axios.get(`http://${route}/chat`)
+                const getChatRoute = await axios.get(`http://192.168.1.158:5000/chat`)
                 console.log(`GET Api data from AIPAGE: ${getChatRoute.data}`)
                 return getChatRoute;
             } catch (error) {
@@ -50,7 +55,7 @@ export default function AIPage() {
         console.log(`Chat route: ${route}`)
         try {
             setLoading(true)
-            const res = await axios.post(`http://${route}/chat`, { textInput: textInput });
+            const res = await axios.post(`http://192.168.1.158:5000/chat`, { textInput: textInput });
             console.log(`AI output: ${res.data}`)
             console.log(`Text input POST request AFTER: ${textInput}`)
             return res.data
@@ -81,26 +86,23 @@ export default function AIPage() {
         setText("")
         const response = await sendMessagesChatGPT(textInput);
         const includesTextFollowedByNewline = /\S+\n/.test(response);
-        if(checkWord(textInput.toLowerCase(), 'flowchart')){
+        if (checkWord(textInput.toLowerCase(), 'flowchart')) {
             if (response.includes('\n') && includesTextFollowedByNewline) {
-                setTextOutputs(prevValue => [...prevValue, ...response.split('\n')]);
+                setTextOutputs(prevValue => [...prevValue, ...response.split('\n')]); // splits divs if text has a \n after
             } else {
                 setTextOutputs(prevValue => [...prevValue, response])
             }
         } else {
             setTextOutputs(prevValue => [...prevValue, response])
-        }   
+        }
     }
 
-    function saveGPTResponseAsPage(input) {
-
-    }
 
     return (
         <View className="flex-1">
             <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }} style={{ marginBottom: 70 }}
                 ref={scrollViewRef} onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}>
-                {arrInputs.map((userInput, key) =>
+                {arrInputs && arrInputs.map((userInput, key) =>
                     <TaskAIOutput
                         arrInputsState={arrInputs}
                         userInput={userInput} key={key}
@@ -127,13 +129,59 @@ export default function AIPage() {
         </View>
     );
 }
-function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, inputContainsFlowchart, inputContainsDatatable, loadingState, flowchartOutput, flowchartMethod }, key) {
+function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, inputContainsFlowchart, inputContainsDatatable, loadingState, flowchartOutput, flowchartMethod, navigation }, key) {
     console.log(`TaskAI inputs array: ${[arrInputsState]}`)
     console.log(`TaskAI output: ${textOutputKey}`);
+    const [isButtonHeld, setIsButtonHeld] = useState(false)
+    const [touchPosition, setTouchPosition] = useState({
+        y: 0,
+    })
+    const { isSaved, setIsSaved } = useSaveState()
+    const saveButton = useSharedValue(0)
+    const privPage = useSelector(state => state.privPage);
+    const dispatch = useDispatch();
+
+    const chatArea = useRef(null)
+    
+    function popUpMenu(event) {
+        setTouchPosition({ y: event.nativeEvent.locationY, })
+        setIsButtonHeld(!isButtonHeld)
+    }
+
+    function saveAsPage(pageContent) {
+        if (pageContent !== '') {
+            console.log(`Private Page from AIPage.jsx: ${JSON.stringify(privPage)}`)
+            dispatch(addPrivatePage({ content: pageContent }))
+            setIsSaved(!isSaved);
+            console.log("Edit button tapped!")    
+        } else {
+            console.log("Error")
+        }
+    }
+    function regenerate() {
+        console.log("Regenerate")
+    }
+    
+    const saveAsPageString = 'Save as page'
+    const regenerateResponse = 'Regenerate Response';
     return (
         <React.Fragment key={key}>
             <Text key={key} className="text-lg items-start m-10 mr-24 mt-4">{userInput}</Text>
-            <View className="flex-row mt-4 bg-white w-full max-h-fit justify-center " key={`${key}_view`}>
+            <TouchableOpacity ref={chatArea} onLongPress={popUpMenu} className="flex-row mt-4 bg-white w-full max-h-fit justify-center " key={`${key}_view`}>
+                {isButtonHeld && (
+                    <View style={{ top: touchPosition.y }} className='flex-col absolute bg-slate-300 w-40 h-36 rounded z-10'>
+                        {[saveAsPageString, regenerateResponse].map((item, index) => (
+                            <Pressable onPress={item === saveAsPageString ? () => saveAsPage(textOutputKey) : regenerate} key={`chat-options_${index}`} className='pt-5 px-3 items-center flex-row'>
+                                {item === saveAsPageString ? (
+                                    <FontAwesomeIcon icon={faFile} size={20} />
+                                ) : item === regenerateResponse && (
+                                    <FontAwesomeIcon icon={faArrowsSpin} size={20} />
+                                )}
+                                <Text key={index} className='font-medium text-xs text-black pl-3'>{item}</Text>
+                            </Pressable>
+                        ))}
+                    </View>
+                )}
                 <FontAwesomeIcon icon={faFaceSmile} style={{ position: 'absolute', top: 40, left: 10 }} size={29} />
                 <Text className="m-10 mr-12 text-lg">
                     {loadingState && key === arrInputsState.length - 1
@@ -142,7 +190,7 @@ function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, in
                 {/* Check if the user types "flowchart" or "datable" and display that */}
                 {inputContainsFlowchart && <CustomFlowChart flowchartInputs={flowchartOutput} />}
                 {inputContainsDatatable && <CustomDataTable inputs={userInput} />}
-            </View>
+            </TouchableOpacity>
         </React.Fragment>
     )
 }

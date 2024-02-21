@@ -65,7 +65,7 @@ function HomeScreen({ navigation }) {
         console.log("Connecting to server")
         async function fetchServer() {
             try {
-                const response = await axios.get(`http://${route}/`)
+                const response = await axios.get(`http://${route}:5000`)
                 console.log(`GET Api data from HOME: ${response.data}`)
                 setData(response)
                 return response;
