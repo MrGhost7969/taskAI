@@ -10,11 +10,12 @@ import { route } from './exports/exports.js'
 import { useDispatch, useSelector } from 'react-redux';
 import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown, useAnimatedStyle, useSharedValue, withDelay, withSequence, withTiming } from 'react-native-reanimated';
 import { addPrivatePage } from '../reduxFiles/privPageSlice';
-
+import { createNativeStackNavigator, getFocusedRouteNameFromRoute } from '@react-navigation/native-stack';
 import * as tf from '@tensorflow/tfjs'
 import axios from 'axios';
 import { faArrowsSpin, faPager, faPen, faSpinner } from '@fortawesome/free-solid-svg-icons';
-
+import PageStack from './UserPages/NewPage'
+import { useNavigation } from '@react-navigation/native';
 /*
     todo:
     - interpret the words from the user and sort them in a flowchart based on the type of information it is (decision, sequence, etc)
@@ -23,6 +24,16 @@ import { faArrowsSpin, faPager, faPen, faSpinner } from '@fortawesome/free-solid
     * Use the decision tree algorithm for text classification and random forest for optmization
     * Limit the amount of trees generated while have low bias and optimal run times          
 */
+const Stack = createNativeStackNavigator()
+
+// function AIPageStack(){
+//     return(
+//         <Stack.Navigator>
+//             <Stack.Screen name='AIPage' component={AIPage} />
+//             <Stack.Screen name="PageStack" component={PageStack} options={{ headerTitle: "Page" }} />
+//         </Stack.Navigator>
+//     )
+// }
 
 export default function AIPage() {
     const [dummyArr, setDummyArr] = useState(["Start", "Condition", "Process", "End"])
@@ -129,9 +140,10 @@ export default function AIPage() {
         </View>
     );
 }
-function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, inputContainsFlowchart, inputContainsDatatable, loadingState, flowchartOutput, flowchartMethod, navigation }, key) {
+function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, inputContainsFlowchart, inputContainsDatatable, loadingState, flowchartOutput, flowchartMethod }, key) {
     console.log(`TaskAI inputs array: ${[arrInputsState]}`)
     console.log(`TaskAI output: ${textOutputKey}`);
+    const chatArea = useRef(null)
     const [isButtonHeld, setIsButtonHeld] = useState(false)
     const [touchPosition, setTouchPosition] = useState({
         y: 0,
@@ -140,9 +152,8 @@ function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, in
     const saveButton = useSharedValue(0)
     const privPage = useSelector(state => state.privPage);
     const dispatch = useDispatch();
+    const navigation = useNavigation();
 
-    const chatArea = useRef(null)
-    
     function popUpMenu(event) {
         setTouchPosition({ y: event.nativeEvent.locationY, })
         setIsButtonHeld(!isButtonHeld)
@@ -151,8 +162,10 @@ function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, in
     function saveAsPage(pageContent) {
         if (pageContent !== '') {
             console.log(`Private Page from AIPage.jsx: ${JSON.stringify(privPage)}`)
-            dispatch(addPrivatePage({ content: pageContent }))
+            dispatch(addPrivatePage({ uri: "https://picsum.photos/700", title: "AI Page", content: pageContent }))
             setIsSaved(!isSaved);
+            // direct to page instance with navigation method
+            navigation.navigate('PageStack', { pageTitle: "AI Page", pageContent: pageContent, pageURI: "https://picsum.photos/700" })
             console.log("Edit button tapped!")    
         } else {
             console.log("Error")
@@ -171,7 +184,7 @@ function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, in
                 {isButtonHeld && (
                     <View style={{ top: touchPosition.y }} className='flex-col absolute bg-slate-300 w-40 h-36 rounded z-10'>
                         {[saveAsPageString, regenerateResponse].map((item, index) => (
-                            <Pressable onPress={item === saveAsPageString ? () => saveAsPage(textOutputKey) : regenerate} key={`chat-options_${index}`} className='pt-5 px-3 items-center flex-row'>
+                            <Pressable onPress={item === saveAsPageString ? () => saveAsPage(inputContainsFlowchart ? <CustomFlowChart flowchartInputs={flowchartOutput} /> : textOutputKey) : regenerate} key={`chat-options_${index}`} className='pt-5 px-3 items-center flex-row'>
                                 {item === saveAsPageString ? (
                                     <FontAwesomeIcon icon={faFile} size={20} />
                                 ) : item === regenerateResponse && (

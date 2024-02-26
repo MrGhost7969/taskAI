@@ -66,7 +66,7 @@ export const RowOfCards: React.FC<NewPageProps> = ({navigation, propArr, onPress
                 renderItem={({ item }) => (
                     <Card className="ml-1 mr-6 top-0 left-0 bg-white" style={{ width: 150, height: "50%" }}
                     onPress={() => onPress(item.title, item.content, item.uri)} key={item.title}>
-                        <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} />
+                        <Card.Cover source={{ uri: item.uri }} style={{ width: '100%', height: '70%' }} alt='Cover'/>
                         <Card.Title title={item.title.length > 35 ?
                             item.title.substring(0, Math.min(item.title.length, 10)).concat("...")
                             : item.title} style={{ height: '20%', width: "100%" }} />
