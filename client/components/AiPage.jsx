@@ -52,7 +52,7 @@ export default function AIPage() {
     useEffect(() => {
         async function fetchChatServer() {
             try {
-                const getChatRoute = await axios.get(`http://192.168.1.158:5000/chat`)
+                const getChatRoute = await axios.get(`http://${route}:5000/chat`)
                 console.log(`GET Api data from AIPAGE: ${getChatRoute.data}`)
                 return getChatRoute;
             } catch (error) {
@@ -65,7 +65,7 @@ export default function AIPage() {
         console.log(`Chat route: ${route}`)
         try {
             setLoading(true)
-            const res = await axios.post(`http://192.168.1.158:5000/chat`, { textInput: textInput });
+            const res = await axios.post(`http://${route}:5000/chat`, { textInput: textInput });
             console.log(`AI output: ${res.data}`)
             console.log(`Text input POST request AFTER: ${textInput}`)
             return res.data
