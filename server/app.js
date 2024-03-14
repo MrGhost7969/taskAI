@@ -123,7 +123,8 @@ app.post('/chat', async (req, res) => {
         console.log(`User id AFTER: ${tempUserId} and thready by user id: ${threadByUser[tempUserId]}`)
         // Send the response back to the front-end
         const postAssistantResponse = getAssistantResponse.body.data[0].content[0].text.value 
-        res.status(200).send(postAssistantResponse);
+        // For python fetching: res.status(200).json({ message: postAssistantResponse });
+        res.status(200).send(postAssistantResponse)
     } catch (error) {
         console.error("Error running the assistant:", error);
         res.status(500).json({ error: "Internal server error" });

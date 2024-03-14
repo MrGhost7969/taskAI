@@ -41,9 +41,6 @@ export default function CustomFlowChart({ flowchartInputs }) {
             const newBlockStyle = flowchartInputs.map((output) => {
 
                 // Check for specific conditions and update style accordingly
-                if (output[0] !== "") {
-                    console.log("This is the first element");
-                }
                 if (output === "(condition)") {
                     console.log("It's a decision!");
                     style = {

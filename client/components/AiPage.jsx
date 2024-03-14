@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useForm, Form } from 'react-hook-form';
 import { View, Text, ScrollView, Dimensions, Keyboard, TouchableOpacity, Pressable, TouchableWithoutFeedback } from 'react-native'
 import { TextInput } from 'react-native-paper';
-import { useSaveState } from './exports/exports';
+import { useSaveState, useUserInput } from './exports/exports';
 import CustomFlowChart from './Custom_Diagrams/CustomFlowChart.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFaceSmile, faFile } from '@fortawesome/free-regular-svg-icons';
@@ -37,7 +37,7 @@ const Stack = createNativeStackNavigator()
 
 export default function AIPage() {
     const [dummyArr, setDummyArr] = useState(["Start", "Condition", "Process", "End"])
-    const [textInput, setText] = useState("")
+    const { textInput, setTextInput } = useUserInput()
     const [active, setActive] = useState(false)
     const [press, setPress] = useState(false)
     const [textData, setTextData] = useState('')
@@ -49,7 +49,6 @@ export default function AIPage() {
     const { control, formState: { errors } } = useForm()
     const scrollViewRef = useRef()
     let name = "User"
-
     useEffect(() => {
         async function fetchChatServer() {
             try {
@@ -94,9 +93,17 @@ export default function AIPage() {
         Keyboard.dismiss()
         setPress(!press)
         setArrInputs(oldArr => [...oldArr, textInput])
-        setText("")
+        setTextInput("")
         const response = await sendMessagesChatGPT(textInput);
         const includesTextFollowedByNewline = /\S+\n/.test(response);
+        // try {
+        //     const pyResponse = await axios.post('http://diagramClassifier.py/predict', {
+        //         data: response
+        //     })
+        //     return pyResponse.data
+        // } catch (error) {
+        //     console.log(`Error fetching PYTHON code: ${error}`)
+        // }
         if (checkWord(textInput.toLowerCase(), 'flowchart')) {
             if (response.includes('\n') && includesTextFollowedByNewline) {
                 setTextOutputs(prevValue => [...prevValue, ...response.split('\n')]); // splits divs if text has a \n after
@@ -128,7 +135,7 @@ export default function AIPage() {
             <View className="justify-center items-center">
                 {(arrInputs === undefined || arrInputs.length === 0) && <Text className="text-base absolute bottom-96">Hello there, {name}</Text>}
                 <Form action='/chat' name='chat' control={control} render={() => (
-                    <TextInput placeholder='Start creating!' onChangeText={text => setText(text)}
+                    <TextInput placeholder='Start creating!' onChangeText={text => setTextInput(text)}
                         className="w-11/12 bottom-7 absolute" mode='outlined' outlineColor='black' value={textInput}
                         activeOutlineColor='gray' onFocus={() => setActive(true)} style={{ backgroundColor: 'white' }}
                         right={
@@ -148,11 +155,18 @@ function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, in
     const [touchPosition, setTouchPosition] = useState({
         y: 0,
     })
+    const [active, setActive] = useState(false);
     const { isSaved, setIsSaved } = useSaveState()
-    const saveButton = useSharedValue(0)
     const privPage = useSelector(state => state.privPage);
     const dispatch = useDispatch();
     const navigation = useNavigation();
+
+    useEffect(() => {
+        const unfocus = navigation.addListener('focus', () => {
+            setActive(false)
+        })
+        return () => unfocus
+    }, [navigation, active])
 
     function popUpMenu(event) {
         setTouchPosition({ y: event.nativeEvent.locationY, })
@@ -160,13 +174,13 @@ function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, in
     }
 
     function saveAsPage(pageContent) {
-        if (pageContent !== '') {
+        if (pageContent !== '' && pageContent !== null) {
             console.log(`Private Page from AIPage.jsx: ${JSON.stringify(privPage)}`)
             dispatch(addPrivatePage({ uri: "https://picsum.photos/700", title: "AI Page", content: pageContent }))
             setIsSaved(!isSaved);
             // direct to page instance with navigation method
             navigation.navigate('PageStack', { pageTitle: "AI Page", pageContent: pageContent, pageURI: "https://picsum.photos/700" })
-            console.log("Edit button tapped!")    
+            console.log("Edit button tapped!")
         } else {
             console.log("Error")
         }
@@ -174,7 +188,7 @@ function TaskAIOutput({ arrInputsState, userInput, textOutput, textOutputKey, in
     function regenerate() {
         console.log("Regenerate")
     }
-    
+
     const saveAsPageString = 'Save as page'
     const regenerateResponse = 'Regenerate Response';
     return (
@@ -224,6 +238,6 @@ function CustomDataTable({ inputs }) {
 //  Keyboard.dismiss()
 //  setPress(!press)
 //  setArrInputs(oldArr => [...oldArr, textInput])
-//  setText("")
+//  setTextInput("")
 //  setDummyArr([...dummyArr])
 // }

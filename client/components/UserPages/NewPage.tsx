@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Image, FlatList } from 'react-native';
+import React, { ReactNode } from 'react';
+import { View, Text, Image, FlatList, ScrollView } from 'react-native';
 import { Card } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -7,7 +7,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
     Home: undefined,
-    CreatePage: {pageTitle: string, pageContent: string, pageURI: string}
+    CreatePage: {
+        pageTitle: string, 
+        pageContent: string | ReactNode, 
+        pageURI: string
+    },
 }
 interface NewPageProps {
     navigation: StackNavigationProp<RootStackParamList, 'CreatePage'>;
@@ -39,17 +43,36 @@ const NewPage: React.FC<NewPageProps> = ({ route }) => {
     console.log('Page Title: ', pageTitle);
     console.log('Page Content: ', pageContent);
     console.log('Page URI: ', pageURI);
+
+    function isFunctionComponent(component: ReactNode) {
+        return (
+            typeof component === 'function' && 
+            String(component).includes('return React.createElement')
+        )
+    }
+
     return (
         <>
-            <Image source={{uri: pageURI }} style={{width: '100%', height: 120}}/>
-            <Roles roles={[{ name: 'Admin', key: 0 }]} />
-            <Text style={{fontSize: 35, left: 15, width: '95%', height: 150}}>{pageTitle}</Text>
-            <Text style={{top: 15, left: 15}}>{pageContent}</Text>
+            <Image source={{ uri: pageURI }} style={{ width: '100%', height: 130 }} />
+            <Text style={{ fontSize: 35, left: 15, top: 15, width: '95%', height: 150 }} className='font-bold'>{pageTitle}</Text>
+            <ScrollView className='w-full h-full flex-col' contentContainerStyle={{justifyContent: 'center', alignItems: 'center'}}>
+                <View>
+                    {isFunctionComponent(pageContent) ? (
+                        // If pageContent is a function component (React component), render it directly
+                        <>
+                            {pageContent}
+                        </>
+                    ) : (
+                        // If pageContent is a string, render it as text
+                        <Text className='left-4 z-10 h-full w-full'>{pageContent}</Text>
+                    )}
+                </View>
+            </ScrollView>
         </>
     );
 };
 
-export const RowOfCards: React.FC<NewPageProps> = ({navigation, propArr, onPress}) => {
+export const RowOfCards: React.FC<NewPageProps> = ({propArr, onPress}) => {
     if (!propArr || propArr.length === 0) {
         return <Text>No pages available.</Text>;
     }
